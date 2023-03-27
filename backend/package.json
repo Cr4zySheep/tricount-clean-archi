@@ -1,0 +1,30 @@
+{
+  "name": "@tricount/backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build --clean && tsc --project tsconfig.build.json",
+    "start": "tsc && node ./dist/index.js",
+    "start:prod": "node ./build/index.js",
+    "lint": "eslint src/ test/",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@vitest/coverage-c8": "^0.29.7",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard-with-typescript": "^34.0.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "2.8.7",
+    "typescript": "^5.0.2",
+    "vitest": "^0.29.7"
+  }
+}
