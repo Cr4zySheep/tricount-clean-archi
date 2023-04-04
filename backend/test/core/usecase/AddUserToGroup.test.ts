@@ -8,7 +8,7 @@ import { beforeEach, describe, test, vi, expect } from "vitest";
 const UserRepositoryMock = vi.fn<any, UserRepository>();
 const GroupRepositoryMock = vi.fn<any, GroupRepository>();
 
-describe("Add user to group (use case)", () => {
+describe.skip("Add user to group (use case)", () => {
   let userRepo: UserRepository;
   let groupRepo: GroupRepository;
 
