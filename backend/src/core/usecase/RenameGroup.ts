@@ -1,13 +1,14 @@
-import { type Group } from "../entity/Group";
+import { Group } from "../entity/Group";
 import { type GroupRepository } from "../repository/GroupRepository";
-import { type Result } from "./utils";
+import { type Result } from "../../utils";
 
 export class RenameGroup {
   constructor(private readonly groupRepo: GroupRepository) {}
 
   async execute(id: number, name: string): Promise<Result<Group>> {
-    if (name.length === 0) {
-      return { success: false, error: "Group name should not be empty" };
+    const validationResult = Group.validateName(name);
+    if (!validationResult.success) {
+      return validationResult;
     }
 
     const group = await this.groupRepo.findById(id);
@@ -15,7 +16,7 @@ export class RenameGroup {
       return { success: false, error: "Group not found" };
     }
 
-    group.name = name;
+    group.name = validationResult.payload;
 
     await this.groupRepo.save(group);
 
