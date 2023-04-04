@@ -1,15 +1,25 @@
-import { type User } from "./User";
-
 export class Group {
-  name: string;
-  members: User[];
+  /** Group's id */
+  public readonly id: number;
 
-  constructor(name: string, members: User[]) {
+  /** Group's name */
+  public name: string;
+
+  /** Ids of the group's members */
+  public membersId: number[];
+
+  /** Ids of the group's transactions */
+  public transactionsId: number[];
+
+  constructor(
+    id: number,
+    name: string,
+    membersId: number[],
+    transactionsId: number[]
+  ) {
+    this.id = id;
     this.name = name;
-    this.members = members;
-  }
-
-  addMember(user: User): void {
-    this.members.push(user);
+    this.membersId = membersId;
+    this.transactionsId = transactionsId;
   }
 }
