@@ -1,6 +1,6 @@
+import { type Result } from "src/utils";
 import { Group } from "../entity/Group";
 import { type GroupRepository } from "../repository/GroupRepository";
-import { type Result } from "../../utils";
 
 export class RenameGroup {
   constructor(private readonly groupRepo: GroupRepository) {}
