@@ -1,0 +1,20 @@
+name: Lint and tests (backend)
+run-name: ${{ github.actor }} just pushed some changes 🚀
+on: [push]
+jobs:
+  Lint-And-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependancies and first build
+        run: npm ci && npm run build
+        working-directory: ./backend
+      - name: Run the linter
+        run: npm run lint
+        working-directory: ./backend
+      - name: Run tests!
+        run: npm run test
+        working-directory: ./backend
