@@ -12,7 +12,7 @@ describe("Create group (use case)", () => {
   });
 
   describe("Happy path", () => {
-    test("Given a name, it should create a with appropriate name and use the next available id", async () => {
+    test("Given a name, it should create a group with appropriate name and use the next available id", async () => {
       // Arrange
       const createGroup = new CreateGroup(groupRepo);
       groupRepo.create = vi.fn(async (name) =>
