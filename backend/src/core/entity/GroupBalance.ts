@@ -4,8 +4,8 @@ export class GroupBalance {
 
   /**
    * Balance of each members.
-   * - A negative amount means that this user owns money to the group.
-   * - A positive amount means that the group owns money to this user.
+   * - A negative amount means that this user owes money to the group.
+   * - A positive amount means that the group owes money to this user.
    */
   public balancePerMemberId: Map<number, number>;
 
