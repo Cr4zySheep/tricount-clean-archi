@@ -7,7 +7,7 @@ Technologies:
 * Typescript
 * Node v18
 * [Vitest](https://vitest.dev/)
-* Fastify server (Soon™)
+* Fastify server
 
 ### Get started
 
@@ -18,4 +18,11 @@ To share the same configuration, you can open the following workspace with VSCod
 1. Make sure you are using node v18
 2. Go into the `backend` directory
 3. Install the dependancies with `npm i`
-4. You can run the project with `npm start` or you can run the test with `npm test`
+4. You can run the project with `npm start` and the API will be accessible at [localhost:8080](http://localhost:8080).
+5. Or you can run the test with `npm test`, it will run the tests in watch mode.
+
+**Note:** The dev server occasionnaly crash when editing files, you just to restart it manually.
+
+### Swagger / OpenAPI
+
+During development, you can access a swagger at [localhost:8080/docs](http://localhost:8080/docs).
