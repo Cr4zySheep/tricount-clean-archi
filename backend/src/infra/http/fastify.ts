@@ -1,5 +1,8 @@
 import Fastify, { type FastifyInstance } from "fastify";
+import { GroupController } from "../controller/GroupController";
+import FastifySwagger from "@fastify/swagger";
 import FastifySwaggerUI from "@fastify/swagger-ui";
+import { createRepositories } from "../repository/createRepositories";
 
 const envToLogger = {
   development: {
@@ -14,12 +17,17 @@ const envToLogger = {
   production: true,
   test: false,
 };
+export type EnvironmentType = keyof typeof envToLogger;
 
-async function createServer(): Promise<FastifyInstance> {
+export async function createServer(
+  env: EnvironmentType = "development"
+): Promise<FastifyInstance> {
   const server = Fastify({
-    // TODO: Dynamically load the correct configuration
-    logger: envToLogger.development,
+    logger: envToLogger[env],
   });
+
+  // Create services, repositories, ...
+  const repositories = createRepositories();
 
   // Loading order
   // * Plugins
@@ -48,6 +56,8 @@ async function createServer(): Promise<FastifyInstance> {
   // * Hooks
 
   // * App services
+  await server.register(GroupController, { prefix: "/group", repositories });
+
   await server.ready();
   server.swagger();
 

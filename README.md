@@ -26,3 +26,26 @@ To share the same configuration, you can open the following workspace with VSCod
 ### Swagger / OpenAPI
 
 During development, you can access a swagger at [localhost:8080/docs](http://localhost:8080/docs).
+
+### How to create a controller
+
+Controller template:
+
+```typescript
+export const ExampleController: FastifyPluginAsync<{
+  repositories: { group: GroupRepository };
+}> = async (fastify: FastifyInstance, options): Promise<void> => {
+  // Retrieve necessary dependencies
+  const { group } = options.repositories;
+
+  // Register routes with usecase, etc.
+  // Use typebox to generate the swagger and parse the incoming request
+  // ...
+};
+```
+
+Then, register it in `fastify.ts` with
+
+```typescript
+await server.register(ExampleController, { prefix: "/example", repositories });
+```
