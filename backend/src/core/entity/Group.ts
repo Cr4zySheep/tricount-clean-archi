@@ -1,4 +1,6 @@
 import type { Result } from "src/utils";
+import type { GroupMember } from "./GroupMember";
+import type { Transaction } from "./Transaction";
 
 export class Group {
   /** Group's id */
@@ -7,22 +9,22 @@ export class Group {
   /** Group's name */
   public name: string;
 
-  /** Ids of the group's members */
-  public membersId: number[];
+  /** Group members */
+  public members: GroupMember[];
 
-  /** Ids of the group's transactions */
-  public transactionsId: number[];
+  /** Group transactions */
+  public transactions: Transaction[];
 
   constructor(
     id: number,
     name: string,
-    membersId: number[],
-    transactionsId: number[]
+    members: GroupMember[],
+    transactions: Transaction[]
   ) {
     this.id = id;
     this.name = name;
-    this.membersId = membersId;
-    this.transactionsId = transactionsId;
+    this.members = members;
+    this.transactions = transactions;
   }
 
   static validateName(name: any): Result<string> {
