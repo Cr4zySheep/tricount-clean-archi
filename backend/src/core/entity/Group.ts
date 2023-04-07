@@ -1,6 +1,6 @@
 import type { Result } from "src/utils";
-import { GroupMember } from "./GroupMember";
-import { Transaction } from "./Transaction";
+import type { GroupMember } from "./GroupMember";
+import type { Transaction } from "./Transaction";
 
 export class Group {
   /** Group's id */
