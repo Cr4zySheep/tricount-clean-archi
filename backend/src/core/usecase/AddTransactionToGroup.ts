@@ -2,7 +2,22 @@ import { type Group } from "../entity/Group";
 import { type GroupRepository } from "../repository/GroupRepository";
 import { type Result } from "src/utils";
 
-export class AddTransactionToGroup {
+export interface IAddTransactionToGroup {
+  execute: (
+    groupId: number,
+    payerId: number,
+    amount: number
+  ) => Promise<Result<Group>>;
+}
+
+export type AddTransactionToGroupRequestObject = Parameters<
+  IAddTransactionToGroup["execute"]
+>;
+export type AddTransactionToGroupResponseObject = ReturnType<
+  IAddTransactionToGroup["execute"]
+>;
+
+export class AddTransactionToGroup implements IAddTransactionToGroup {
   constructor(private readonly groupRepo: GroupRepository) {}
 
   async execute(

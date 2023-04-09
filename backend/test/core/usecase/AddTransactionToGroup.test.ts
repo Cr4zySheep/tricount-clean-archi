@@ -12,10 +12,11 @@ describe("Add transaction to group (use case)", () => {
 
   beforeEach(() => {
     groupRepo = new GroupRepositoryMock();
+    groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
   });
 
   describe("Unhappy path", () => {
-    test("Given a false group id, when adding a transaction to a non existing group, an error 'Group not found' should be raised", async () => {
+    test("Given a false group id, when adding a transaction to a non existing group, an error 'Group not found' should be returned", async () => {
       // Arrange
       groupRepo.findById = vi.fn().mockResolvedValue(null);
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
@@ -30,7 +31,7 @@ describe("Add transaction to group (use case)", () => {
       });
     });
 
-    test("Given a group composed of one user, when adding a transaction from another user, an error 'Payer does not belong to the group' should be raised", async () => {
+    test("Given a group composed of one user, when adding a transaction from another user, an error 'Payer does not belong to the group' should be returned", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
       const anotherUser = new GroupMember(2, "John2");
@@ -52,12 +53,11 @@ describe("Add transaction to group (use case)", () => {
       });
     });
 
-    test("Given a group composed of one user, when adding a transaction of 0€ from this user, an error 'Non positive transaction was submitted' should be raised", async () => {
+    test("Given a group composed of one user, when adding a transaction of 0€ from this user, an error 'Non positive transaction was submitted' should be returned", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
       const group = new Group(0, "group1", [user], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
@@ -70,12 +70,11 @@ describe("Add transaction to group (use case)", () => {
       });
     });
 
-    test("Given a group composed of one user, when adding a transaction of -1€ from this user, an error 'Non positive transaction was submitted' should be raised", async () => {
+    test("Given a group composed of one user, when adding a transaction of -1€ from this user, an error 'Non positive transaction was submitted' should be returned", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
       const group = new Group(0, "group1", [user], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
@@ -95,7 +94,6 @@ describe("Add transaction to group (use case)", () => {
       const user = new GroupMember(1, "John");
       const group = new Group(0, "group1", [user], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       groupRepo.addTransaction = vi.fn(async (group, user, amount) => {
         group.transactions.push(new Transaction(0, user.id, amount));
         return Promise.resolve(group);
@@ -123,7 +121,6 @@ describe("Add transaction to group (use case)", () => {
       const transaction = new Transaction(0, user.id, 1);
       const group = new Group(0, "group1", [user], [transaction]);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       groupRepo.addTransaction = vi.fn(async (group, user, amount) => {
         group.transactions.push(new Transaction(1, user.id, amount));
         return Promise.resolve(group);
