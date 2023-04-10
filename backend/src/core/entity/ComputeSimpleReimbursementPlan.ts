@@ -7,7 +7,7 @@ export class ComputeSimpleReimbursementPlan {
    * Compute the reimbursement plan of a group thanks to its transactions.
    * Last cent problem is managed by minimizing the money to be sent (ie. truncating the values sent)
    */
-  computeSimpleReimbursementPlan(group: Group): ReimbursementPlan {
+  compute(group: Group): ReimbursementPlan {
     const dueSumsPerMemberId =
       ComputeSimpleReimbursementPlan.retrieveDueSumsPerMemberIdFromTransactions(
         group.transactions

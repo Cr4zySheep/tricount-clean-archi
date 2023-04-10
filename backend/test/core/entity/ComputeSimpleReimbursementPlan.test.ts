@@ -27,8 +27,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult = "Member 1 owes 1.5 euros to member 0.";
@@ -57,8 +56,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult =
@@ -89,8 +87,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult =
@@ -122,8 +119,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult = "Member 1 owes 1.5 euros to member 0.";
@@ -160,8 +156,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult = "Member 1 owes 1 euros to member 0.";
@@ -196,8 +191,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult = "Member 1 owes 2 euros to member 0.";
@@ -232,8 +226,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult = "The group is balanced.";
@@ -269,8 +262,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult =
@@ -308,8 +300,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult =
@@ -362,8 +353,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult =
@@ -403,8 +393,7 @@ describe("Reimbursement Plan", () => {
           new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan =
-          computeSimpleReimbursementPlan.computeSimpleReimbursementPlan(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
 
         // Assert
         const expectedResult =
