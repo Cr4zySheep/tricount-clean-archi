@@ -7,10 +7,10 @@ export interface IComputeSimpleReimbursementPlanUsecase {
   execute: (groupId: number) => Promise<Result<ReimbursementPlan>>;
 }
 
-export type ComputeSimpleReimbursementPlanRequestObject = Parameters<
+export type ComputeSimpleReimbursementPlanUsecaseRequestObject = Parameters<
   IComputeSimpleReimbursementPlanUsecase["execute"]
 >;
-export type ComputeSimpleReimbursementPlanResponseObject = ReturnType<
+export type ComputeSimpleReimbursementPlanUsecaseResponseObject = ReturnType<
   IComputeSimpleReimbursementPlanUsecase["execute"]
 >;
 

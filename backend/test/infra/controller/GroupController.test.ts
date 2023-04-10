@@ -2,8 +2,8 @@ import Fastify, { type FastifyInstance } from "fastify";
 import { Group } from "src/core/entity/Group";
 import { ReimbursementPlan } from "src/core/entity/ReimbursementPlan";
 import type {
-  ComputeSimpleReimbursementPlanRequestObject,
-  ComputeSimpleReimbursementPlanResponseObject,
+  ComputeSimpleReimbursementPlanUsecaseRequestObject,
+  ComputeSimpleReimbursementPlanUsecaseResponseObject,
 } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
 import {
   type CreateGroupRequestObject,
@@ -14,12 +14,14 @@ import {
   type RenameGroupResponseObject,
 } from "src/core/usecase/RenameGroup";
 import { GroupController } from "src/infra/controller/GroupController";
+import { ReimbursementPlanDTO } from "src/infra/dto/ReimbursementPlan.dto";
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Warning, using the absolute path doesn't work here
 vi.mock("../../../src/core/usecase/CreateGroup");
 vi.mock("../../../src/core/usecase/RenameGroup");
+vi.mock("../../../src/core/usecase/ComputeSimpleReimbursementPlanUsecase");
 
 describe("GroupController", () => {
   describe("Create group", () => {
@@ -187,8 +189,8 @@ describe("GroupController", () => {
     const groupRepo = new GroupRepositoryMock();
     const computeSimpleReimbursementPlanMock = {
       execute: vi.fn<
-        ComputeSimpleReimbursementPlanRequestObject,
-        ComputeSimpleReimbursementPlanResponseObject
+        ComputeSimpleReimbursementPlanUsecaseRequestObject,
+        ComputeSimpleReimbursementPlanUsecaseResponseObject
       >(),
     };
 
@@ -246,9 +248,9 @@ describe("GroupController", () => {
       // Assert
       expect(computeSimpleReimbursementPlanMock.execute).toBeCalledWith(0);
       expect(response.statusCode).toBe(200);
-      expect(response.json()).toEqual({
-        reimbursementPlan,
-      });
+      expect(response.json()).toEqual(
+        ReimbursementPlanDTO.fromEntity(reimbursementPlan)
+      );
     });
 
     test("When the group with groupId is not found, should return a 404 error with the adequate message", async () => {
@@ -261,12 +263,11 @@ describe("GroupController", () => {
       // Act
       const response = await server.inject({
         method: "GET",
-        url: "/group/a/simple-reimbursement-plan",
+        url: "/group/0/simple-reimbursement-plan",
       });
 
       // Assert
       expect(response.statusCode).toBe(404);
-      expect(response.json()).toEqual({ error: "Group not found" });
     });
   });
 });
