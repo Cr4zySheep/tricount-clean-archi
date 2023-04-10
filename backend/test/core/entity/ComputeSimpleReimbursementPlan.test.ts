@@ -280,7 +280,7 @@ describe("Reimbursement Plan", () => {
         expect(reimbursementPlan.toString()).toEqual(expectedResult);
       });
 
-      test("Given a group with 3 members, 0 paid 3 euros for the 1 and 2 and 1 paid 1 euro for 0 and 1", async () => {
+      test("Given a group with 3 members, 0 paid 3 euros for 1 and 2, 1 paid 1 euro for 0 and 1", async () => {
         // Arrange
         const member0 = new GroupMember(0, "0");
         const member1 = new GroupMember(1, "1");
@@ -320,7 +320,7 @@ describe("Reimbursement Plan", () => {
       });
     });
 
-    describe("Three transactions case", () => {
+    describe("Three or more transactions case", () => {
       test("Given a group with 3 members, 2 paid 1.5 euros for the group, 0 paid 3 euros for the group, 1 paid 1 euro for the group, 2 paid 2.5 for the group", async () => {
         // Arrange
         const member0 = new GroupMember(0, "0");
