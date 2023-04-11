@@ -5,6 +5,7 @@ import { AddTransactionToGroup } from "src/core/usecase/AddTransactionToGroup";
 
 const AddTransactionInputSchema = Type.Object({
   payerId: Type.Number(),
+  recipientsId: Type.Array(Type.Number()),
   amount: Type.Number(),
 });
 type AddTransactionInput = Static<typeof AddTransactionInputSchema>;
@@ -24,11 +25,12 @@ export const TransactionController: FastifyPluginAsync<{
     "/",
     { schema: { body: AddTransactionInputSchema, params: GroupIdSchema } },
     async (request, reply) => {
-      const { payerId, amount } = request.body;
+      const { payerId, recipientsId, amount } = request.body;
 
       const result = await addTransactionToGroup.execute(
         request.params.groupId,
         payerId,
+        recipientsId,
         amount
       );
 

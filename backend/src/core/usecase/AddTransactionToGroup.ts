@@ -1,11 +1,13 @@
 import { type Group } from "../entity/Group";
 import { type GroupRepository } from "../repository/GroupRepository";
 import { type Result } from "src/utils";
+import { type GroupMember } from "../entity/GroupMember";
 
 export interface IAddTransactionToGroup {
   execute: (
     groupId: number,
     payerId: number,
+    recipientsId: number[],
     amount: number
   ) => Promise<Result<Group>>;
 }
@@ -23,6 +25,7 @@ export class AddTransactionToGroup implements IAddTransactionToGroup {
   async execute(
     groupId: number,
     payerId: number,
+    recipientsId: number[],
     amount: number
   ): Promise<Result<Group>> {
     const group = await this.groupRepo.findById(groupId);
@@ -47,9 +50,24 @@ export class AddTransactionToGroup implements IAddTransactionToGroup {
       };
     }
 
+    const recipients: GroupMember[] = [];
+    group.members.forEach((member) => {
+      if (recipientsId.includes(member.id)) {
+        recipients.push(member);
+      }
+    });
+
+    if (recipients.length !== recipientsId.length) {
+      return {
+        success: false,
+        error: "One recipient does not belong to the group or is duplicated",
+      };
+    }
+
     const updatedGroup = await this.groupRepo.addTransaction(
       group,
       payer,
+      recipients,
       amount
     );
 

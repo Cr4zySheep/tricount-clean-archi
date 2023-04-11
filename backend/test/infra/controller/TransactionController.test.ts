@@ -45,68 +45,112 @@ describe("TransactionController", () => {
 
     test("Given a payerId and a amount of 1€, it should succeed with a status 201 and return the updated group", async () => {
       // Arrange
+      const groupId = 0;
+      const memberId = 0;
+      const transactionId = 1;
+      const otherMemberId = 1;
       addTransactionToGroupMock.execute.mockResolvedValue({
         success: true,
         payload: {
-          id: 0,
+          id: groupId,
           name: "new group",
-          members: [new GroupMember(0, "John")],
-          transactions: [new Transaction(0, 0, 1)],
+          members: [new GroupMember(memberId, "John")],
+          transactions: [
+            new Transaction(transactionId, memberId, [otherMemberId], 1),
+          ],
         },
       });
 
       // Act
       const response = await server.inject({
         method: "POST",
-        url: `/group/${0}/transaction`,
-        payload: { payerId: 0, amount: 1 },
+        url: `/group/${groupId}/transaction`,
+        payload: {
+          payerId: memberId,
+          recipientsId: [otherMemberId],
+          amount: 1,
+        },
       });
 
       // Assert
-      expect(addTransactionToGroupMock.execute).toBeCalledWith(0, 0, 1);
+      expect(addTransactionToGroupMock.execute).toBeCalledWith(
+        groupId,
+        memberId,
+        [transactionId],
+        1
+      );
       expect(response.statusCode).toBe(201);
       expect(response.json()).toEqual({
-        id: 0,
+        id: groupId,
         name: "new group",
-        members: [new GroupMember(0, "John")],
-        transactions: [new Transaction(0, 0, 1)],
+        members: [new GroupMember(memberId, "John")],
+        transactions: [
+          new Transaction(transactionId, memberId, [otherMemberId], 1),
+        ],
       });
     });
 
     test("Given a payerId and a amount of 3€, it should succeed with a status 201 and return the updated group", async () => {
+      const groupId = 3;
+      const memberId = 1;
+      const transactionId = 0;
+      const otherMemberId = 2;
       // Arrange
       addTransactionToGroupMock.execute.mockResolvedValue({
         success: true,
         payload: {
-          id: 3,
+          id: groupId,
           name: "new group",
           members: [new GroupMember(1, "John")],
-          transactions: [new Transaction(0, 1, 3)],
+          transactions: [
+            new Transaction(
+              transactionId,
+              memberId,
+              [memberId, otherMemberId],
+              3
+            ),
+          ],
         },
       });
 
       // Act
       const response = await server.inject({
         method: "POST",
-        url: `/group/${3}/transaction`,
-        payload: { payerId: 0, amount: 1 },
+        url: `/group/${groupId}/transaction`,
+        payload: {
+          payerId: memberId,
+          recipientsId: [memberId, otherMemberId],
+          amount: 1,
+        },
       });
 
       // Assert
-      expect(addTransactionToGroupMock.execute).toBeCalledWith(3, 0, 1);
+      expect(addTransactionToGroupMock.execute).toBeCalledWith(
+        groupId,
+        memberId,
+        [memberId, otherMemberId],
+        1
+      );
       expect(response.statusCode).toBe(201);
       expect(response.json()).toEqual({
-        id: 3,
+        id: groupId,
         name: "new group",
-        members: [new GroupMember(1, "John")],
-        transactions: [new Transaction(0, 1, 3)],
+        members: [new GroupMember(memberId, "John")],
+        transactions: [
+          new Transaction(
+            transactionId,
+            memberId,
+            [memberId, otherMemberId],
+            3
+          ),
+        ],
       });
     });
 
     test("Given no payload, it should return an error 400", async () => {
       const response = await server.inject({
         method: "POST",
-        url: `/group/${0}/transaction`,
+        url: `/group/0/transaction`,
       });
 
       expect(response.statusCode).toBe(400);
@@ -115,7 +159,7 @@ describe("TransactionController", () => {
     test("Given an empty payload, it should return an error 400", async () => {
       const response = await server.inject({
         method: "POST",
-        url: `/group/${0}/transaction`,
+        url: `/group/0/transaction`,
         payload: {},
       });
 
@@ -125,8 +169,8 @@ describe("TransactionController", () => {
     test("Given not a full payload, it should return an error 400", async () => {
       const response = await server.inject({
         method: "POST",
-        url: `/group/${0}/transaction`,
-        payload: { groupId: 0, payerId: 0 },
+        url: `/group/0/transaction`,
+        payload: { payerId: 0 },
       });
 
       expect(response.statusCode).toBe(400);
@@ -142,8 +186,8 @@ describe("TransactionController", () => {
       // Act
       const response = await server.inject({
         method: "POST",
-        url: `/group/${0}/transaction`,
-        payload: { payerId: 0, amount: 1 },
+        url: `/group/0/transaction`,
+        payload: { payerId: 0, recipientsId: [2], amount: 1 },
       });
 
       // Assert
