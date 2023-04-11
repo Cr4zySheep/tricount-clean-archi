@@ -22,7 +22,7 @@ describe("Calcul balance (use case)", () => {
       // Assert
       expect(result).toEqual({
         success: false,
-        error: "Group id does not exist",
+        error: "Group not found",
       });
     });
   });

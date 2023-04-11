@@ -9,7 +9,7 @@ export class GroupBalanceView {
     this.groupBalance = groupBalance;
   }
 
-  static fromEntries(groupBalance: GroupBalance): GroupBalanceView {
+  static fromGroupBalance(groupBalance: GroupBalance): GroupBalanceView {
     const groupId = groupBalance.groupId;
     const balancePerMember = new Array<MemberBalance>();
     groupBalance.balancePerMemberId.forEach((balance, memberId) => {

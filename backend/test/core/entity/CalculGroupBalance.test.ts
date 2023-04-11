@@ -15,7 +15,7 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 0 for the whole group, it should return a balance null", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 0),
+          new Transaction(0, 0, [0, 1], 0),
         ]);
 
         // Act
@@ -34,7 +34,7 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 2 for the whole group, it should return a balance {0 :1,1 :-1}", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 2),
+          new Transaction(0, 0, [0, 1], 2),
         ]);
 
         // Act
@@ -53,7 +53,7 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 3 for the whole group, it should return a balance {0 :3/2,1 :-3/2}", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 3),
+          new Transaction(0, 0, [0, 1], 3),
         ]);
 
         // Act
@@ -82,7 +82,7 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 0 for the whole group, it should return a balance null", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 0),
+          new Transaction(0, 0, [0, 1, 2], 0),
         ]);
 
         // Act
@@ -102,7 +102,7 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 3 for the whole group, it should return a balance {0 :2,1 :-1, 2 :-1}", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 3),
+          new Transaction(0, 0, [0, 1, 2], 3),
         ]);
 
         // Act
@@ -122,7 +122,7 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 4 for the whole group, it should return a balance {0 :8/3,1 :-4/3, 2 :-4/3}", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 4),
+          new Transaction(0, 0, [0, 1, 2], 4),
         ]);
 
         // Act
@@ -148,8 +148,8 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 0, it should return a balance null", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 0),
-          new Transaction(0, 0, 0),
+          new Transaction(0, 0, [0, 1], 0),
+          new Transaction(0, 0, [0, 1], 0),
         ]);
 
         // Act
@@ -168,8 +168,8 @@ describe("Calcul group balance (entity)", () => {
       test("with payerId 0 and amount 1, it should return a balance {0 :1,1 :-1}", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 1),
-          new Transaction(0, 0, 1),
+          new Transaction(0, 0, [0, 1], 1),
+          new Transaction(0, 0, [0, 1], 1),
         ]);
 
         // Act
@@ -197,8 +197,8 @@ describe("Calcul group balance (entity)", () => {
       test("with transaction 1 :payerId 0 and amount 3 transaction 2 :payerId 0 and amount 2, it should return a balance {0 :10/3 ,1 :-5/3, 2 :-5/3}.", async () => {
         // Arrange
         const group = new Group(1, "group", members, [
-          new Transaction(0, 0, 3),
-          new Transaction(0, 0, 2),
+          new Transaction(0, 0, [0, 1, 2], 3),
+          new Transaction(0, 0, [0, 1, 2], 2),
         ]);
 
         // Act
@@ -224,7 +224,7 @@ describe("Calcul group balance (entity)", () => {
         1,
         "group",
         [],
-        [new Transaction(0, 0, 3), new Transaction(0, 0, 2)]
+        [new Transaction(0, 0, [], 3), new Transaction(0, 0, [], 2)]
       );
 
       // Act

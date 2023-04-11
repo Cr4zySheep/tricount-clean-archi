@@ -22,7 +22,7 @@ export class CalculGroupBalanceUseCase implements ICalculGroupBalanceUseCase {
     if (groupFound == null) {
       return {
         success: false,
-        error: "Group id does not exist",
+        error: "Group not found",
       };
     }
 

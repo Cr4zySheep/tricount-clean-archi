@@ -87,7 +87,7 @@ export const GroupController: FastifyPluginAsync<{
         return reply.status(400).send({ error: result.error });
       }
 
-      return GroupBalanceView.fromEntries(result.payload);
+      return GroupBalanceView.fromGroupBalance(result.payload);
     }
   );
 };
