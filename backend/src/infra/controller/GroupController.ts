@@ -3,6 +3,7 @@ import { CreateGroup } from "src/core/usecase/CreateGroup";
 import { type Static, Type } from "@sinclair/typebox";
 import { RenameGroup } from "src/core/usecase/RenameGroup";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
+import { TransactionController } from "./TransactionController";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -22,6 +23,11 @@ type GroupId = Static<typeof GroupIdSchema>;
 export const GroupController: FastifyPluginAsync<{
   repositories: { group: GroupRepository };
 }> = async (fastify: FastifyInstance, options): Promise<void> => {
+  await fastify.register(TransactionController, {
+    prefix: "/:groupId/transaction",
+    repositories: options.repositories,
+  });
+
   const { group } = options.repositories;
 
   const createGroup = new CreateGroup(group);

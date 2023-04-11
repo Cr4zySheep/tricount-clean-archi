@@ -1,4 +1,6 @@
 import { Group } from "src/core/entity/Group";
+import { GroupMember } from "src/core/entity/GroupMember";
+import { Transaction } from "src/core/entity/Transaction";
 import { GroupRepositoryInMemory } from "src/infra/repository/GroupRepositoryInMemory";
 import { describe, expect, test } from "vitest";
 
@@ -73,6 +75,49 @@ describe("GroupRepositoryInMemory", () => {
       // Assert
       const expectedResult = new Group(0, "new name", [], []);
       expect(updatedGroup).toEqual(expectedResult);
+    });
+  });
+
+  describe("addTransaction", () => {
+    test("Given a group without transaction, a new transaction should be added to this group with the next transactionId available", async () => {
+      // Arrange
+      const member = new GroupMember(0, "John");
+      const group = new Group(0, "group0", [member], []);
+      const groupRepo = new GroupRepositoryInMemory([group]);
+
+      // Act
+      await groupRepo.addTransaction(group, group.members[0], 1);
+      const updatedGroup = await groupRepo.findById(group.id);
+
+      // Assert
+      const expectedResult = new Group(
+        0,
+        "group0",
+        [group.members[0]],
+        [new Transaction(0, group.members[0].id, 1)]
+      );
+      expect(updatedGroup).toEqual(expectedResult);
+    });
+
+    test("Given a group with a transaction, a new transaction should be added to this group with the next transactionId available", async () => {
+      // Arrange
+      const member = new GroupMember(0, "John");
+      const transaction = new Transaction(2, member.id, 1);
+      const group = new Group(0, "group0", [member], [transaction]);
+      const groupRepo = new GroupRepositoryInMemory([group]);
+
+      // Act
+      await groupRepo.addTransaction(group, member, 3);
+      const updatedGroup = await groupRepo.findById(group.id);
+
+      // Assert
+      const expectedResult = new Group(
+        0,
+        "group0",
+        [member],
+        [transaction, new Transaction(3, member.id, 3)]
+      );
+      expect(updatedGroup).toStrictEqual(expectedResult);
     });
   });
 });

@@ -1,9 +1,12 @@
 import { Group } from "src/core/entity/Group";
+import { type GroupMember } from "src/core/entity/GroupMember";
+import { Transaction } from "src/core/entity/Transaction";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
 
 export class GroupRepositoryInMemory implements GroupRepository {
   private readonly groups: Group[];
   private nextId: number;
+  private nextTransactionId: number;
 
   constructor(initialGroups?: Group[]) {
     this.groups = initialGroups ?? [];
@@ -14,6 +17,11 @@ export class GroupRepositoryInMemory implements GroupRepository {
             -1
           ) + 1
         : 0;
+    const transactionIds = this.groups
+      .flatMap((group) => group.transactions)
+      .map((transaction) => transaction.id);
+    this.nextTransactionId =
+      transactionIds.length === 0 ? 0 : Math.max(...transactionIds) + 1;
   }
 
   async create(name: string): Promise<Group> {
@@ -37,5 +45,20 @@ export class GroupRepositoryInMemory implements GroupRepository {
     this.groups[idx] = updatedGroup;
 
     return this.groups[idx];
+  }
+
+  async addTransaction(
+    group: Group,
+    payer: GroupMember,
+    amount: number
+  ): Promise<Group> {
+    const transaction = new Transaction(
+      this.nextTransactionId,
+      payer.id,
+      amount
+    );
+    group.transactions.push(transaction);
+    this.nextTransactionId += 1;
+    return this.save(group);
   }
 }
