@@ -1,4 +1,5 @@
 import type { Group } from "../entity/Group";
+import { type GroupMember } from "../entity/GroupMember";
 import { ReimbursementPlan } from "../entity/ReimbursementPlan";
 import type { Transaction } from "../entity/Transaction";
 
@@ -9,20 +10,22 @@ import type { Transaction } from "../entity/Transaction";
 export function computeSimpleReimbursementPlan(
   group: Group
 ): ReimbursementPlan {
-  const dueSumsPerMemberId = retrieveDueSumsPerMemberIdFromTransactions(
+  const reimbursementPlan = new ReimbursementPlan(group.id);
+
+  computePairwiseReimbursementsFromTransactions(
+    reimbursementPlan,
     group.transactions
   );
 
-  const reimbursementPerMemberId =
-    aggregateDueSumsPerMemberId(dueSumsPerMemberId);
-  return new ReimbursementPlan(group.id, reimbursementPerMemberId);
+  aggregatePairwiseReimbursements(reimbursementPlan, group.members);
+
+  return reimbursementPlan;
 }
 
-function retrieveDueSumsPerMemberIdFromTransactions(
+function computePairwiseReimbursementsFromTransactions(
+  reimbursementPlan: ReimbursementPlan,
   transactions: Transaction[]
-): Map<number, Map<number, number[]>> {
-  const dueSumsPerMemberId = new Map<number, Map<number, number[]>>();
-
+): void {
   transactions.forEach((transaction) => {
     const dueAmount = transaction.getDebtPerRecipient();
 
@@ -31,111 +34,62 @@ function retrieveDueSumsPerMemberIdFromTransactions(
         return;
       }
 
-      addDueSumFromPayerToPayee(
-        dueSumsPerMemberId,
+      const alreadyDueAmount = reimbursementPlan.getReimbursementAmount(
+        recipientId,
+        transaction.payerId
+      );
+
+      reimbursementPlan.setReimbursement(
         recipientId,
         transaction.payerId,
-        dueAmount
+        dueAmount + alreadyDueAmount
       );
     });
   });
-
-  return dueSumsPerMemberId;
 }
 
-function addDueSumFromPayerToPayee(
-  dueSumsPerMemberId: Map<number, Map<number, number[]>>,
-  payerId: number,
-  payeeId: number,
-  dueSum: number
+function aggregatePairwiseReimbursements(
+  reimbursementPlan: ReimbursementPlan,
+  groupMembers: GroupMember[]
 ): void {
-  const dueSumsByPayer = dueSumsPerMemberId.get(payerId);
-  if (dueSumsByPayer === undefined) {
-    const newDueSumsByPayer = new Map<number, number[]>();
-    newDueSumsByPayer.set(payeeId, [dueSum]);
-    dueSumsPerMemberId.set(payerId, newDueSumsByPayer);
-    return;
-  }
-
-  const dueSumsByPayerToPayee = dueSumsByPayer.get(payeeId);
-  if (dueSumsByPayerToPayee === undefined) {
-    dueSumsByPayer.set(payeeId, [dueSum]);
-    return;
-  }
-
-  dueSumsByPayerToPayee.push(dueSum);
-}
-
-function aggregateDueSumsPerMemberId(
-  dueSumsPerMemberId: Map<number, Map<number, number[]>>
-): Map<number, Map<number, number>> {
-  const reimbursementPerMemberId = new Map<number, Map<number, number>>();
-  const alreadyComputedMembersId = new Map<number, boolean>();
-
-  dueSumsPerMemberId.forEach((memberDueSums, memberId) => {
-    memberDueSums.forEach((dueSums, beneficiaryId) => {
-      if (alreadyComputedMembersId.get(memberId) !== undefined) {
-        return;
-      }
-
-      const reverseDueSum = getSumDueByBeneficiaryToMember(
-        dueSumsPerMemberId,
-        memberId,
-        beneficiaryId
-      );
-      const aggregatedDueSum = dueSums.reduce((a, b) => a + b) - reverseDueSum;
-      const truncedAggregatedDueSum = Math.trunc(100 * aggregatedDueSum) / 100;
-
-      if (aggregatedDueSum > 0) {
-        addReimbursementFromPayerToPayee(
-          reimbursementPerMemberId,
-          memberId,
-          beneficiaryId,
-          truncedAggregatedDueSum
+  groupMembers.forEach((memberA, indexA) => {
+    groupMembers.forEach((memberB, indexB) => {
+      if (indexA < indexB) {
+        const dueAmountFromAToB = reimbursementPlan.getReimbursementAmount(
+          memberA.id,
+          memberB.id
         );
-      } else if (aggregatedDueSum < 0) {
-        addReimbursementFromPayerToPayee(
-          reimbursementPerMemberId,
-          beneficiaryId,
-          memberId,
-          -truncedAggregatedDueSum
+        const dueAmountFromBToA = reimbursementPlan.getReimbursementAmount(
+          memberB.id,
+          memberA.id
+        );
+
+        const simplifiedDueAmountFromAToB =
+          dueAmountFromAToB - dueAmountFromBToA;
+
+        const realDueAmountFromAToB = computeRealDueAmount(
+          simplifiedDueAmountFromAToB
+        );
+        const realDueAmountFromBToA = computeRealDueAmount(
+          -simplifiedDueAmountFromAToB
+        );
+
+        reimbursementPlan.setReimbursement(
+          memberA.id,
+          memberB.id,
+          realDueAmountFromAToB
+        );
+        reimbursementPlan.setReimbursement(
+          memberB.id,
+          memberA.id,
+          realDueAmountFromBToA
         );
       }
     });
-
-    alreadyComputedMembersId.set(memberId, true);
   });
-
-  return reimbursementPerMemberId;
 }
 
-function getSumDueByBeneficiaryToMember(
-  dueSumsPerMemberId: Map<number, Map<number, number[]>>,
-  memberId: number,
-  beneficiaryId: number
-): number {
-  const eventualReverseDueSum = dueSumsPerMemberId
-    .get(beneficiaryId)
-    ?.get(memberId);
-  return eventualReverseDueSum != null
-    ? eventualReverseDueSum.reduce((a, b) => a + b)
-    : 0;
-}
-
-function addReimbursementFromPayerToPayee(
-  reimbursementPerMemberId: Map<number, Map<number, number>>,
-  payerId: number,
-  payeeId: number,
-  dueSum: number
-): void {
-  const memberReimbursement = reimbursementPerMemberId.get(payerId);
-
-  if (memberReimbursement === undefined) {
-    const newMemberReimbursement = new Map<number, number>();
-    newMemberReimbursement.set(payeeId, dueSum);
-    reimbursementPerMemberId.set(payerId, newMemberReimbursement);
-    return;
-  }
-
-  memberReimbursement.set(payeeId, dueSum);
+function computeRealDueAmount(dueAmount: number): number {
+  const positiveDueAmount = Math.max(dueAmount, 0);
+  return Math.trunc(100 * positiveDueAmount) / 100;
 }

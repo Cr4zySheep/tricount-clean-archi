@@ -4,7 +4,7 @@ import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
 import { computeSimpleReimbursementPlan } from "src/core/behaviour/computeSimpleReimbursementPlan";
 
-describe("compute Simple Reimbursement Plan", () => {
+describe("computeSimpleReimbursementPlan", () => {
   describe("Single transaction case", () => {
     test("Given a group with 2 members, 0 paid 3 euros for the group", async () => {
       // Arrange
