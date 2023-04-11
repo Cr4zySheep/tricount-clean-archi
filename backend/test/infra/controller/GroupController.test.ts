@@ -268,6 +268,7 @@ describe("GroupController", () => {
 
       // Assert
       expect(response.statusCode).toBe(404);
+      expect(response.json()).toEqual({ error: "Group not found" });
     });
   });
 });
