@@ -2,7 +2,7 @@ import { Group } from "src/core/entity/Group";
 import { describe, test, expect } from "vitest";
 import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
-import { ComputeSimpleReimbursementPlan } from "src/core/entity/ComputeSimpleReimbursementPlan";
+import { computeSimpleReimbursementPlan } from "src/core/behaviours/computeSimpleReimbursementPlan";
 
 describe("Reimbursement Plan", () => {
   describe("Compute Simple Reimbursement Plan", () => {
@@ -23,11 +23,9 @@ describe("Reimbursement Plan", () => {
           [member0, member1],
           [transaction]
         );
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult = "Member 1 owes 1.5 euros to member 0.";
@@ -52,11 +50,9 @@ describe("Reimbursement Plan", () => {
           [member0, member1, member2],
           [transaction]
         );
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult =
@@ -83,11 +79,9 @@ describe("Reimbursement Plan", () => {
           [member0, member1, member2],
           [transaction]
         );
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
 
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult =
@@ -115,11 +109,8 @@ describe("Reimbursement Plan", () => {
           [transaction]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult = "Member 1 owes 1.5 euros to member 0.";
@@ -152,11 +143,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult = "Member 1 owes 1 euros to member 0.";
@@ -187,11 +175,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult = "Member 1 owes 2 euros to member 0.";
@@ -222,11 +207,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult = "The group is balanced.";
@@ -258,11 +240,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult =
@@ -296,11 +275,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult =
@@ -349,11 +325,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1, transaction2, transaction3]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult =
@@ -389,11 +362,8 @@ describe("Reimbursement Plan", () => {
           [transaction0, transaction1, transaction2]
         );
 
-        const computeSimpleReimbursementPlan =
-          new ComputeSimpleReimbursementPlan();
-
         // Act
-        const reimbursementPlan = computeSimpleReimbursementPlan.compute(group);
+        const reimbursementPlan = computeSimpleReimbursementPlan(group);
 
         // Assert
         const expectedResult =
