@@ -5,7 +5,7 @@ import { GroupRepositoryMock } from "./test-helpers";
 import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
 import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
-import { computeSimpleReimbursementPlan } from "src/core/behaviours/computeSimpleReimbursementPlan";
+import { computeSimpleReimbursementPlan } from "src/core/behaviour/computeSimpleReimbursementPlan";
 
 describe("Compute Simple Reimbursement Plan Usecase (use case)", () => {
   let groupRepo: GroupRepository;
