@@ -17,7 +17,7 @@ describe("GroupBalanceView", () => {
       const groupBalance = new GroupBalance(0, balanceMapTest);
 
       // Act
-      const result = GroupBalanceView.fromEntries(groupBalance);
+      const result = GroupBalanceView.fromGroupBalance(groupBalance);
 
       // Assert
       const expectedResult = new GroupBalanceView(
@@ -32,7 +32,7 @@ describe("GroupBalanceView", () => {
       const groupBalance = new GroupBalance(0, balanceMapTest);
 
       // Act
-      const result = GroupBalanceView.fromEntries(groupBalance);
+      const result = GroupBalanceView.fromGroupBalance(groupBalance);
 
       // Assert
       const expectedBalanceView = [new MemberBalance(0, 0)];
@@ -47,7 +47,7 @@ describe("GroupBalanceView", () => {
       const groupBalance = new GroupBalance(0, balanceMapTest);
 
       // Act
-      const result = GroupBalanceView.fromEntries(groupBalance);
+      const result = GroupBalanceView.fromGroupBalance(groupBalance);
 
       // Assert
       const expectedBalanceView = [

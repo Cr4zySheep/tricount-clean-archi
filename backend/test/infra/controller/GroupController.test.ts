@@ -326,7 +326,7 @@ describe("GroupController", () => {
       expect(calculGroupBalanceMock.execute).toBeCalledWith(0);
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual(
-        GroupBalanceView.fromEntries(new GroupBalance(0, balanceMapTest))
+        GroupBalanceView.fromGroupBalance(new GroupBalance(0, balanceMapTest))
       );
     });
   });

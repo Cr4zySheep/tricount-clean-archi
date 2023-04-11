@@ -6,13 +6,13 @@ export class CalculGroupBalance {
   calcul(group: Group): GroupBalance {
     const memberIds = Array.from(group.members.keys());
 
-    const result = balancePerMember(memberIds, group.transactions);
+    const result = computeBalancePerMemberId(memberIds, group.transactions);
 
     return new GroupBalance(group.id, result);
   }
 }
 
-function balancePerMember(
+function computeBalancePerMemberId(
   memberIds: number[],
   transactions: Transaction[]
 ): Map<number, number> {
@@ -20,31 +20,20 @@ function balancePerMember(
   memberIds.forEach((id) => result.set(id, 0));
 
   transactions.forEach((transaction) => {
-    memberIds.forEach((id) =>
-      transaction.payerId === id
-        ? result.set(
-            id,
-            Number(result.get(id)) + payerBalance(memberIds, transaction)
-          )
-        : result.set(
-            id,
-            Number(result.get(id)) + receiverBalance(memberIds, transaction)
-          )
-    );
+    memberIds.forEach((id) => {
+      let memberBalance = result.get(id) ?? 0;
+
+      if (transaction.payerId === id) {
+        memberBalance += transaction.amount;
+      }
+      memberBalance -= transaction.getDebtPerRecipient();
+      result.set(id, memberBalance);
+    });
   });
-  for (const i of result.keys()) {
+  for (const id of result.keys()) {
     // keeping only 10 digits
-    result.set(i, Number(Number(result.get(i)).toFixed(10)));
+    const memberBalance = result.get(id) ?? 0;
+    result.set(id, Number(memberBalance.toFixed(10)));
   }
   return result;
-}
-
-function payerBalance(memberIds: number[], transaction: Transaction): number {
-  return transaction.amount - transaction.amount / memberIds.length;
-}
-function receiverBalance(
-  memberIds: number[],
-  transaction: Transaction
-): number {
-  return -transaction.amount / memberIds.length;
 }
