@@ -22,11 +22,12 @@ function computeBalancePerMemberId(
   transactions.forEach((transaction) => {
     memberIds.forEach((id) => {
       let memberBalance = result.get(id) ?? 0;
-
       if (transaction.payerId === id) {
         memberBalance += transaction.amount;
       }
-      memberBalance -= transaction.getDebtPerRecipient();
+      if (transaction.recipientsId.includes(id)) {
+        memberBalance -= transaction.getDebtPerRecipient();
+      }
       result.set(id, memberBalance);
     });
   });
