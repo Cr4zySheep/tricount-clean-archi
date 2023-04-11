@@ -3,6 +3,7 @@ import type { GroupRepository } from "src/core/repository/GroupRepository";
 import { RenameGroup } from "src/core/usecase/RenameGroup";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { GroupRepositoryMock } from "./test-helpers";
+import { GroupMember } from "src/core/entity/GroupMember";
 
 describe("Rename group (use case)", () => {
   let groupRepo: GroupRepository;
@@ -15,15 +16,16 @@ describe("Rename group (use case)", () => {
     test("Given an existing group, when trying to name it, it should rename it accordingly", async () => {
       // Arrange
       const renameGroup = new RenameGroup(groupRepo);
+      const member = new GroupMember(1, "username");
       groupRepo.findById = vi
         .fn()
-        .mockResolvedValue(new Group(2, "previous name", [1], []));
+        .mockResolvedValue(new Group(2, "previous name", [member], []));
 
       // Act
       const result = await renameGroup.execute(2, "new name");
 
       // Assert
-      const expectedGroup = new Group(2, "new name", [1], []);
+      const expectedGroup = new Group(2, "new name", [member], []);
       expect(result).toEqual({
         success: true,
         payload: expectedGroup,
@@ -36,9 +38,10 @@ describe("Rename group (use case)", () => {
     test("Given an existing group, when trying to rename it with an empty name, it should return the according error", async () => {
       // Arrange
       const renameGroup = new RenameGroup(groupRepo);
+      const member = new GroupMember(1, "username");
       groupRepo.findById = vi
         .fn()
-        .mockResolvedValue(new Group(2, "previous name", [1], []));
+        .mockResolvedValue(new Group(2, "previous name", [member], []));
 
       // Act
       const result = await renameGroup.execute(1, "");
