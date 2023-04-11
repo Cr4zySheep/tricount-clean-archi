@@ -4,7 +4,7 @@ import { type Static, Type } from "@sinclair/typebox";
 import { RenameGroup } from "src/core/usecase/RenameGroup";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { CalculGroupBalanceUseCase } from "src/core/usecase/CalculGroupBalanceUseCase";
-import { GroupBalanceDTO } from "../dto/GroupBalance.dto";
+import { GroupBalanceView } from "../view/GroupBalance.view";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -87,7 +87,7 @@ export const GroupController: FastifyPluginAsync<{
         return reply.status(400).send({ error: result.error });
       }
 
-      return GroupBalanceDTO.fromEntries(result.payload);
+      return GroupBalanceView.fromEntries(result.payload);
     }
   );
 };

@@ -16,7 +16,7 @@ import {
 import { GroupController } from "src/infra/controller/GroupController";
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { GroupBalanceDTO, MemberBalance } from "src/infra/dto/GroupBalance.dto";
+import { GroupBalanceView } from "src/infra/view/GroupBalance.view";
 
 // Warning, using the absolute path doesn't work here
 vi.mock("../../../src/core/usecase/CreateGroup");
@@ -231,7 +231,7 @@ describe("GroupController", () => {
       expect(calculGroupBalanceMock.execute).toBeCalledWith(0);
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual(
-        GroupBalanceDTO.fromEntries(new GroupBalance(0, balanceMapTest))
+        GroupBalanceView.fromEntries(new GroupBalance(0, balanceMapTest))
       );
     });
   });
