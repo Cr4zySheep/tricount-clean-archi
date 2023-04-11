@@ -3,6 +3,8 @@ import { CreateGroup } from "src/core/usecase/CreateGroup";
 import { type Static, Type } from "@sinclair/typebox";
 import { RenameGroup } from "src/core/usecase/RenameGroup";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
+import { CalculGroupBalanceUseCase } from "src/core/usecase/CalculGroupBalanceUseCase";
+import { GroupBalanceDTO } from "../dto/GroupBalance.dto";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -63,6 +65,29 @@ export const GroupController: FastifyPluginAsync<{
       }
 
       return result.payload;
+    }
+  );
+
+  const calculBalance = new CalculGroupBalanceUseCase(group);
+  fastify.post<{ Body: RenameGroupInput; Params: GroupId }>(
+    "/:id/calculBalance",
+    {
+      schema: {
+        params: GroupIdSchema,
+        tags: ["group"],
+      },
+    },
+    async (request, reply) => {
+      const groupId = request.params.id;
+
+      const result = await calculBalance.execute(groupId);
+
+      // TODO: Return 400 when error because of invalid input and 404 when group not found
+      if (!result.success) {
+        return reply.status(400).send({ error: result.error });
+      }
+
+      return GroupBalanceDTO.fromEntries(result.payload);
     }
   );
 };

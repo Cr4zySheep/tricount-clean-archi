@@ -1,5 +1,6 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { Group } from "src/core/entity/Group";
+import { GroupBalance } from "src/core/entity/GroupBalance";
 import {
   type CreateGroupRequestObject,
   type CreateGroupResponseObject,
@@ -8,13 +9,19 @@ import {
   type RenameGroupRequestObject,
   type RenameGroupResponseObject,
 } from "src/core/usecase/RenameGroup";
+import {
+  type CalculGroupBalanceUseCaseRequestObject,
+  type CalculGroupBalanceUseCaseResponseObject,
+} from "src/core/usecase/CalculGroupBalanceUseCase";
 import { GroupController } from "src/infra/controller/GroupController";
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { GroupBalanceDTO, MemberBalance } from "src/infra/dto/GroupBalance.dto";
 
 // Warning, using the absolute path doesn't work here
 vi.mock("../../../src/core/usecase/CreateGroup");
 vi.mock("../../../src/core/usecase/RenameGroup");
+vi.mock("../../../src/core/usecase/CalculGroupBalanceUseCase");
 
 describe("GroupController", () => {
   describe("Create group", () => {
@@ -174,6 +181,58 @@ describe("GroupController", () => {
       // Assert
       expect(response.statusCode).toBe(400);
       expect(response.json()).toEqual({ error: "Error message" });
+    });
+  });
+  describe("Calcul group balance", () => {
+    let server: FastifyInstance;
+    const groupRepo = new GroupRepositoryMock();
+    const calculGroupBalanceMock = {
+      execute: vi.fn<
+        CalculGroupBalanceUseCaseRequestObject,
+        CalculGroupBalanceUseCaseResponseObject
+      >(),
+    };
+
+    beforeEach(async () => {
+      const module = await import("src/core/usecase/CalculGroupBalanceUseCase");
+      // @ts-expect-error It isn't typed as a Mock
+      module.CalculGroupBalanceUseCase.mockReturnValue(calculGroupBalanceMock);
+
+      // server = await createServer("test");
+      server = Fastify({ logger: false });
+      await server.register(GroupController, {
+        prefix: "/group",
+        repositories: { group: groupRepo },
+      });
+      await server.ready();
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.resetAllMocks();
+    });
+
+    test("Given an existing group, it should successfully return the group balance and have status code of 200", async () => {
+      // Arrange
+      const balanceMapTest = new Map<number, number>();
+      balanceMapTest.set(0, 1);
+      calculGroupBalanceMock.execute.mockResolvedValue({
+        success: true,
+        payload: new GroupBalance(0, balanceMapTest),
+      });
+
+      // Act
+      const response = await server.inject({
+        method: "POST",
+        url: "/group/0/calculBalance",
+      });
+
+      // Assert
+      expect(calculGroupBalanceMock.execute).toBeCalledWith(0);
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual(
+        GroupBalanceDTO.fromEntries(new GroupBalance(0, balanceMapTest))
+      );
     });
   });
 });
