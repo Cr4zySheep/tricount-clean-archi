@@ -5,7 +5,7 @@ import { RenameGroup } from "src/core/usecase/RenameGroup";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { TransactionController } from "./TransactionController";
 import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
-import { ReimbursementPlanDTO } from "../dto/ReimbursementPlan.dto";
+import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -93,7 +93,7 @@ export const GroupController: FastifyPluginAsync<{
         return reply.status(404).send({ error: result.error });
       }
 
-      return ReimbursementPlanDTO.fromEntity(result.payload);
+      return ReimbursementPlanView.fromEntity(result.payload);
     }
   );
 };

@@ -14,7 +14,7 @@ import {
   type RenameGroupResponseObject,
 } from "src/core/usecase/RenameGroup";
 import { GroupController } from "src/infra/controller/GroupController";
-import { ReimbursementPlanDTO } from "src/infra/dto/ReimbursementPlan.dto";
+import { ReimbursementPlanView } from "src/infra/view/ReimbursementPlanView";
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -249,7 +249,7 @@ describe("GroupController", () => {
       expect(computeSimpleReimbursementPlanMock.execute).toBeCalledWith(0);
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual(
-        ReimbursementPlanDTO.fromEntity(reimbursementPlan)
+        ReimbursementPlanView.fromEntity(reimbursementPlan)
       );
     });
 

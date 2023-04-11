@@ -1,6 +1,6 @@
 import type { ReimbursementPlan } from "src/core/entity/ReimbursementPlan";
 
-export class ReimbursementPlanDTO {
+export class ReimbursementPlanView {
   groupId: number;
   membersReimbursements: MemberReimbursements[];
 
@@ -11,7 +11,7 @@ export class ReimbursementPlanDTO {
 
   public static fromEntity(
     reimbursementPlan: ReimbursementPlan
-  ): ReimbursementPlanDTO {
+  ): ReimbursementPlanView {
     const newMemberReimbursements: MemberReimbursements[] = [];
     reimbursementPlan.reimbursementPerMemberId.forEach(
       (memberReimbursementsMap, memberId) => {
@@ -20,7 +20,7 @@ export class ReimbursementPlanDTO {
         );
       }
     );
-    return new ReimbursementPlanDTO(
+    return new ReimbursementPlanView(
       reimbursementPlan.groupId,
       newMemberReimbursements
     );
@@ -29,9 +29,9 @@ export class ReimbursementPlanDTO {
 
 export class MemberReimbursements {
   memberId: number;
-  memberDueSums: MemberDueSumsToBeneficiary[];
+  memberDueSums: DueSumToBeneficiary[];
 
-  constructor(memberId: number, memberDueSums: MemberDueSumsToBeneficiary[]) {
+  constructor(memberId: number, memberDueSums: DueSumToBeneficiary[]) {
     this.memberId = memberId;
     this.memberDueSums = memberDueSums;
   }
@@ -40,17 +40,15 @@ export class MemberReimbursements {
     memberId: number,
     memberReimbursementsMap: Map<number, number>
   ): MemberReimbursements {
-    const newMemberDueSums: MemberDueSumsToBeneficiary[] = [];
+    const newMemberDueSums: DueSumToBeneficiary[] = [];
     memberReimbursementsMap.forEach((amount, beneficiaryId) => {
-      newMemberDueSums.push(
-        new MemberDueSumsToBeneficiary(beneficiaryId, amount)
-      );
+      newMemberDueSums.push(new DueSumToBeneficiary(beneficiaryId, amount));
     });
     return new MemberReimbursements(memberId, newMemberDueSums);
   }
 }
 
-export class MemberDueSumsToBeneficiary {
+export class DueSumToBeneficiary {
   beneficiaryId: number;
   amount: number;
 
