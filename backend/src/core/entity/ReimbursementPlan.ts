@@ -22,8 +22,6 @@ export class ReimbursementPlan {
   }
 
   public toString(): string {
-    let reimbursementPlanString = "";
-
     if (this.reimbursementPerMemberId.size === 0) {
       return `The group is balanced.`;
     }
@@ -33,17 +31,14 @@ export class ReimbursementPlan {
     );
     reimbursementPerMemberIdEntries.sort((a, b) => a[0] - b[0]);
 
-    reimbursementPerMemberIdEntries.forEach((entries) => {
-      const payerId = entries[0];
-      const reimbursementsOwedByPayer = entries[1];
-      reimbursementPlanString +=
-        ReimbursementPlan.getReimbursmentOwedByPayerString(
+    return reimbursementPerMemberIdEntries
+      .map(([payerId, reimbursementsOwedByPayer]) => {
+        return ReimbursementPlan.getReimbursmentOwedByPayerString(
           payerId,
           reimbursementsOwedByPayer
         );
-      reimbursementPlanString += "\n";
-    });
-    return reimbursementPlanString.slice(0, -1);
+      })
+      .join("\n");
   }
 
   public getReimbursementAmount(payerId: number, payeeId: number): number {
@@ -103,19 +98,19 @@ export class ReimbursementPlan {
     payerId: number,
     reimbursementsOwedByPayer: Map<number, number>
   ): string {
-    let reimbursementsOwedByPayerString = `Member ${payerId} owes`;
-
     const reimbursementsOwedByPayerEntries = Array.from(
       reimbursementsOwedByPayer.entries()
     );
     reimbursementsOwedByPayerEntries.sort((a, b) => a[0] - b[0]);
 
-    reimbursementsOwedByPayerEntries.forEach((entries) => {
-      const payeeId = entries[0];
-      const amount = entries[1];
-      reimbursementsOwedByPayerString += ` ${amount} euros to member ${payeeId},`;
-    });
-
-    return reimbursementsOwedByPayerString.slice(0, -1) + ".";
+    return (
+      `Member ${payerId} owes` +
+      reimbursementsOwedByPayerEntries
+        .map(([payeeId, amount]) => {
+          return ` ${amount} euros to member ${payeeId}`;
+        })
+        .join(",") +
+      "."
+    );
   }
 }
