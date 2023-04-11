@@ -2,7 +2,7 @@ import { Group } from "src/core/entity/Group";
 import type { GroupRepository } from "src/core/repository/GroupRepository";
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { GroupRepositoryMock } from "./test-helpers";
-import { CalculBalanceUseCase } from "src/core/usecase/CalculBalanceUseCase";
+import { CalculGroupBalanceUseCase } from "src/core/usecase/CalculGroupBalanceUseCase";
 
 describe("Calcul balance (use case)", () => {
   let groupRepo: GroupRepository;
@@ -14,7 +14,7 @@ describe("Calcul balance (use case)", () => {
   describe("Unhappy path", () => {
     test("Given a group id that doesn't exist, it should return the appropriate error", async () => {
       // Arrange
-      const calculBalance = new CalculBalanceUseCase(groupRepo);
+      const calculBalance = new CalculGroupBalanceUseCase(groupRepo);
       groupRepo.findById = vi.fn().mockResolvedValue(null);
 
       // Act
