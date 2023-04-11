@@ -120,4 +120,49 @@ describe("GroupRepositoryInMemory", () => {
       expect(updatedGroup).toStrictEqual(expectedResult);
     });
   });
+
+  describe("removeTransaction", () => {
+    test("Given a group with one transaction, the group transactions array should be empty", async () => {
+      // Arrange
+      const member = new GroupMember(0, "John");
+      const transaction = new Transaction(0, member.id, 1);
+      const group = new Group(0, "group0", [member], [transaction]);
+      const groupRepo = new GroupRepositoryInMemory([group]);
+
+      // Act
+      await groupRepo.removeTransaction(group, transaction);
+      const updatedGroup = await groupRepo.findById(group.id);
+
+      // Assert
+      const expectedResult = new Group(0, "group0", [group.members[0]], []);
+      expect(updatedGroup).toEqual(expectedResult);
+    });
+
+    test("Given a group with a transaction, a new transaction should be added to this group with the next transactionId available", async () => {
+      // Arrange
+      const member = new GroupMember(0, "John");
+      const firstTransaction = new Transaction(2, member.id, 1);
+      const secondTransaction = new Transaction(4, member.id, 3);
+      const group = new Group(
+        0,
+        "group0",
+        [member],
+        [firstTransaction, secondTransaction]
+      );
+      const groupRepo = new GroupRepositoryInMemory([group]);
+
+      // Act
+      await groupRepo.removeTransaction(group, secondTransaction);
+      const updatedGroup = await groupRepo.findById(group.id);
+
+      // Assert
+      const expectedResult = new Group(
+        0,
+        "group0",
+        [member],
+        [firstTransaction]
+      );
+      expect(updatedGroup).toStrictEqual(expectedResult);
+    });
+  });
 });
