@@ -1,4 +1,3 @@
-import { Group } from "src/core/entity/Group";
 import type { GroupRepository } from "src/core/repository/GroupRepository";
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { GroupRepositoryMock } from "./test-helpers";

@@ -1,5 +1,5 @@
 import { Group } from "src/core/entity/Group";
-import { describe, test, expect, beforeEach, vi } from "vitest";
+import { describe, test, expect, beforeEach } from "vitest";
 import { GroupBalance } from "src/core/entity/GroupBalance";
 import { CalculGroupBalance } from "src/core/entity/CalculGroupBalance";
 import { GroupMember } from "src/core/entity/GroupMember";

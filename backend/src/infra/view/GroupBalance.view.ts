@@ -1,6 +1,6 @@
 import { type GroupBalance } from "src/core/entity/GroupBalance";
 
-export class GroupBalanceDTO {
+export class GroupBalanceView {
   private readonly groupId: number;
   private readonly groupBalance: MemberBalance[];
 
@@ -9,14 +9,14 @@ export class GroupBalanceDTO {
     this.groupBalance = groupBalance;
   }
 
-  static fromEntries(groupBalance: GroupBalance): GroupBalanceDTO {
+  static fromEntries(groupBalance: GroupBalance): GroupBalanceView {
     const groupId = groupBalance.groupId;
     const balancePerMember = new Array<MemberBalance>();
     groupBalance.balancePerMemberId.forEach((balance, memberId) => {
       const memberBalance = new MemberBalance(memberId, balance);
       balancePerMember.push(memberBalance);
     });
-    return new GroupBalanceDTO(groupId, balancePerMember);
+    return new GroupBalanceView(groupId, balancePerMember);
   }
 }
 
