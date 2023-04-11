@@ -5,7 +5,10 @@ import { GroupRepositoryMock } from "./test-helpers";
 import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
 import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
+import { ReimbursementPlan } from "src/core/entity/ReimbursementPlan";
 import { computeSimpleReimbursementPlan } from "src/core/behaviour/computeSimpleReimbursementPlan";
+
+// vi.mock("../../../src/core/behaviour/computeSimpleReimbursementPlan");
 
 describe("Compute Simple Reimbursement Plan Usecase (use case)", () => {
   let groupRepo: GroupRepository;
@@ -30,7 +33,12 @@ describe("Compute Simple Reimbursement Plan Usecase (use case)", () => {
         [new Transaction(1, 1, [1, 2], 3)]
       );
 
+      const expectedReimbursementPlan = new ReimbursementPlan(group.id);
+      expectedReimbursementPlan.setReimbursement(2, 1, 1.5);
+
       groupRepo.findById = vi.fn().mockResolvedValue(group);
+      const mock = vi.fn().mockImplementation(computeSimpleReimbursementPlan);
+      mock.mockImplementation(() => expectedReimbursementPlan);
 
       // Act
       const result = await computeSimpleReimbursementPlanUsecase.execute(
@@ -40,7 +48,7 @@ describe("Compute Simple Reimbursement Plan Usecase (use case)", () => {
       // Assert
       expect(result).toEqual({
         success: true,
-        payload: computeSimpleReimbursementPlan(group),
+        payload: expectedReimbursementPlan,
       });
     });
   });
