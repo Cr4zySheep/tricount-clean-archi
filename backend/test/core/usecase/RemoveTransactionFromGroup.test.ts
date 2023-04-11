@@ -3,7 +3,7 @@ import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { beforeEach, describe, test, vi, expect } from "vitest";
 import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
-import { RemoveTransactionToGroup } from "src/core/usecase/RemoveTransactionToGroup";
+import { RemoveTransactionToGroup } from "src/core/usecase/RemoveTransactionFromGroup";
 
 const GroupRepositoryMock = vi.fn<any, GroupRepository>();
 
@@ -99,6 +99,10 @@ describe("Remove transaction to group (use case)", () => {
       const result = await removeTransactionToGroup.execute(group.id, 1);
 
       // Assert
+      expect(groupRepo.removeTransaction).toBeCalledWith(
+        group,
+        secondTransaction
+      );
       expect(result).toStrictEqual({
         success: true,
         payload: new Group(0, "group1", [user], [firstTransaction]),

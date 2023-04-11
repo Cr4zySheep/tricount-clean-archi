@@ -2,7 +2,22 @@ import { type Result } from "src/utils";
 import { type Group } from "../entity/Group";
 import { type GroupRepository } from "../repository/GroupRepository";
 
-export class RemoveTransactionToGroup {
+export interface IRemoveTransactionToGroup {
+  execute: (
+    groupId: number,
+    payerId: number,
+    amount: number
+  ) => Promise<Result<Group>>;
+}
+
+export type RemoveTransactionToGroupRequestObject = Parameters<
+  IRemoveTransactionToGroup["execute"]
+>;
+export type RemoveTransactionToGroupResponseObject = ReturnType<
+  IRemoveTransactionToGroup["execute"]
+>;
+
+export class RemoveTransactionToGroup implements IRemoveTransactionToGroup {
   constructor(private readonly groupRepo: GroupRepository) {}
 
   async execute(

@@ -66,13 +66,9 @@ export class GroupRepositoryInMemory implements GroupRepository {
     group: Group,
     transaction: Transaction
   ): Promise<Group> {
-    const transactionIndexToRemove = group.transactions.findIndex(
-      (tmpTransaction) => tmpTransaction.id === transaction.id
+    group.transactions = group.transactions.filter(
+      (currentTransaction) => currentTransaction.id !== transaction.id
     );
-    const updatedTransactions = group.transactions
-      .slice(0, transactionIndexToRemove)
-      .concat(group.transactions.slice(transactionIndexToRemove + 1));
-    group.transactions = updatedTransactions;
 
     return this.save(group);
   }

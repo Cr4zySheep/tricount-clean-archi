@@ -2,12 +2,19 @@ import { type FastifyInstance, type FastifyPluginAsync } from "fastify";
 import { type Static, Type } from "@sinclair/typebox";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { AddTransactionToGroup } from "src/core/usecase/AddTransactionToGroup";
+import { RemoveTransactionToGroup } from "src/core/usecase/RemoveTransactionFromGroup";
 
 const AddTransactionInputSchema = Type.Object({
   payerId: Type.Number(),
   amount: Type.Number(),
 });
 type AddTransactionInput = Static<typeof AddTransactionInputSchema>;
+
+const RemoveTransactionInputSchema = Type.Object({
+  groupId: Type.Number(),
+  transactionId: Type.Number(),
+});
+type RemoveTransactionInput = Static<typeof RemoveTransactionInputSchema>;
 
 const GroupIdSchema = Type.Object({
   groupId: Type.Number(),
@@ -37,6 +44,24 @@ export const TransactionController: FastifyPluginAsync<{
       }
 
       return reply.status(201).send(result.payload);
+    }
+  );
+
+  const removeTransationToGroup = new RemoveTransactionToGroup(group);
+  fastify.delete<{ Params: RemoveTransactionInput }>(
+    "/:transactionId",
+    { schema: { params: RemoveTransactionInputSchema } },
+    async (request, reply) => {
+      const result = await removeTransationToGroup.execute(
+        request.params.groupId,
+        request.params.transactionId
+      );
+
+      if (!result.success) {
+        return reply.status(400).send({ error: result.error });
+      }
+
+      return reply.status(200).send(result.payload);
     }
   );
 };
