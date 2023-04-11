@@ -22,4 +22,12 @@ export class Transaction {
     this.recipientsId = recipientsId;
     this.amount = amount;
   }
+
+  public getDebtPerRecipient(): number {
+    if (this.recipientsId.length === 0) {
+      return 0;
+    }
+
+    return this.amount / this.recipientsId.length;
+  }
 }

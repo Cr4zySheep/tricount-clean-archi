@@ -1,7 +1,7 @@
 import type { Result } from "src/utils";
 import type { GroupRepository } from "../repository/GroupRepository";
 import type { ReimbursementPlan } from "../entity/ReimbursementPlan";
-import { computeSimpleReimbursementPlan } from "../behaviours/computeSimpleReimbursementPlan";
+import { computeSimpleReimbursementPlan } from "../behaviour/computeSimpleReimbursementPlan";
 
 export interface IComputeSimpleReimbursementPlanUsecase {
   execute: (groupId: number) => Promise<Result<ReimbursementPlan>>;

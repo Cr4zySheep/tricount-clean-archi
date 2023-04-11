@@ -18,20 +18,13 @@ export function computeSimpleReimbursementPlan(
   return new ReimbursementPlan(group.id, reimbursementPerMemberId);
 }
 
-function computeTransactionDueAmount(transaction: Transaction): number {
-  if (transaction.recipientsId.length === 0) {
-    return 0;
-  }
-  return transaction.amount / transaction.recipientsId.length;
-}
-
 function retrieveDueSumsPerMemberIdFromTransactions(
   transactions: Transaction[]
 ): Map<number, Map<number, number[]>> {
   const dueSumsPerMemberId = new Map<number, Map<number, number[]>>();
 
   transactions.forEach((transaction) => {
-    const dueAmount = computeTransactionDueAmount(transaction);
+    const dueAmount = transaction.getDebtPerRecipient();
 
     transaction.recipientsId.forEach((recipientId) => {
       if (recipientId === transaction.payerId) {
