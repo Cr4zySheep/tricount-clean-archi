@@ -6,6 +6,7 @@ import { GroupBalance } from "src/core/entity/GroupBalance";
 import { Group } from "src/core/entity/Group";
 import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
+import { computeGroupBalance } from "src/core/behaviour/computeGroupBalance";
 
 describe("Compute balance (use case)", () => {
   let groupRepo: GroupRepository;
@@ -28,6 +29,17 @@ describe("Compute balance (use case)", () => {
         [new Transaction(1, 1, [1, 2], 3), new Transaction(2, 1, [2], 1)]
       );
       groupRepo.findById = vi.fn().mockResolvedValue(group);
+      const mock = vi.fn().mockImplementation(computeGroupBalance);
+      mock.mockImplementation(
+        () =>
+          new GroupBalance(
+            0,
+            new Map<number, number>([
+              [1, 2.5],
+              [2, -2.5],
+            ])
+          )
+      );
 
       // Act
       const result = await computeBalance.execute(0);

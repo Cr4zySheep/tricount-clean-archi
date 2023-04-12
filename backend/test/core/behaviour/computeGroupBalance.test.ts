@@ -287,11 +287,11 @@ describe("Compute group balance (entity)", () => {
           expect(result).toEqual(expectedResult);
         });
       });
-      describe("Given a group of two members with two transactions, membersId starting at 1", () => {
+      describe("Given a group of two members with membersId starting at 1", () => {
         beforeEach(() => {
           members = [new GroupMember(1, "Luc"), new GroupMember(2, "Jessica")];
         });
-        test("with transaction 1 :payerId 1 and amount 3 for whole group, transaction 2 :payerId 1 and amount 1 for member 0, it should return a balance {0 :-2.5,1 :2.5}.", async () => {
+        test("with transaction 1 :payerId 1 and amount 3 for whole group, transaction 2 :payerId 1 and amount 1 for member 2, it should return a balance {1 : 2.5, 2 : -2.5}.", async () => {
           // Arrange
           const group = new Group(1, "group", members, [
             new Transaction(1, 1, [1, 2], 3),

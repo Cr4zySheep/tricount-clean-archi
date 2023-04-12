@@ -3,10 +3,7 @@ import { GroupBalance } from "../entity/GroupBalance";
 import { type Transaction } from "../entity/Transaction";
 
 export function computeGroupBalance(group: Group): GroupBalance {
-  const memberIds: number[] = [];
-  group.members.forEach((member) => {
-    memberIds.push(member.id);
-  });
+  const memberIds = group.members.map((member) => member.id);
 
   const result = computeBalancePerMemberId(memberIds, group.transactions);
 
