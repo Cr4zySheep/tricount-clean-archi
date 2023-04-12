@@ -50,12 +50,7 @@ export class AddTransactionToGroup implements IAddTransactionToGroup {
       };
     }
 
-    const recipients: GroupMember[] = [];
-    group.members.forEach((member) => {
-      if (recipientsId.includes(member.id)) {
-        recipients.push(member);
-      }
-    });
+    const recipients = group.members.filter(member => recipientsId.includes(member.id));
 
     if (recipients.length !== recipientsId.length) {
       return {
