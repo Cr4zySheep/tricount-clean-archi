@@ -6,7 +6,7 @@ import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { TransactionController } from "./TransactionController";
 import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
 import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
-import { CalculGroupBalanceUseCase } from "src/core/usecase/CalculGroupBalanceUseCase";
+import { ComputeGroupBalanceUseCase } from "src/core/usecase/ComputeGroupBalanceUseCase";
 import { GroupBalanceView } from "../view/GroupBalance.view";
 
 const CreateGroupInputSchema = Type.Object({
@@ -99,9 +99,9 @@ export const GroupController: FastifyPluginAsync<{
     }
   );
 
-  const calculBalance = new CalculGroupBalanceUseCase(group);
+  const computeBalance = new ComputeGroupBalanceUseCase(group);
   fastify.post<{ Body: RenameGroupInput; Params: GroupId }>(
-    "/:id/calculBalance",
+    "/:id/computeBalance",
     {
       schema: {
         params: GroupIdSchema,
@@ -111,7 +111,7 @@ export const GroupController: FastifyPluginAsync<{
     async (request, reply) => {
       const groupId = request.params.id;
 
-      const result = await calculBalance.execute(groupId);
+      const result = await computeBalance.execute(groupId);
 
       if (!result.success) {
         return reply.status(400).send({ error: result.error });
