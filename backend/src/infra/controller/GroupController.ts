@@ -6,6 +6,8 @@ import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { TransactionController } from "./TransactionController";
 import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
 import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
+import { CalculGroupBalanceUseCase } from "src/core/usecase/CalculGroupBalanceUseCase";
+import { GroupBalanceView } from "../view/GroupBalance.view";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -94,6 +96,28 @@ export const GroupController: FastifyPluginAsync<{
       }
 
       return ReimbursementPlanView.fromEntity(result.payload);
+    }
+  );
+
+  const calculBalance = new CalculGroupBalanceUseCase(group);
+  fastify.post<{ Body: RenameGroupInput; Params: GroupId }>(
+    "/:id/calculBalance",
+    {
+      schema: {
+        params: GroupIdSchema,
+        tags: ["group"],
+      },
+    },
+    async (request, reply) => {
+      const groupId = request.params.id;
+
+      const result = await calculBalance.execute(groupId);
+
+      if (!result.success) {
+        return reply.status(400).send({ error: result.error });
+      }
+
+      return GroupBalanceView.fromGroupBalance(result.payload);
     }
   );
 };

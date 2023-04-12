@@ -1,0 +1,29 @@
+import type { GroupRepository } from "src/core/repository/GroupRepository";
+import { describe, test, expect, beforeEach, vi } from "vitest";
+import { GroupRepositoryMock } from "./test-helpers";
+import { CalculGroupBalanceUseCase } from "src/core/usecase/CalculGroupBalanceUseCase";
+
+describe("Calcul balance (use case)", () => {
+  let groupRepo: GroupRepository;
+
+  beforeEach(() => {
+    groupRepo = new GroupRepositoryMock();
+  });
+
+  describe("Unhappy path", () => {
+    test("Given a group id that doesn't exist, it should return the appropriate error", async () => {
+      // Arrange
+      const calculBalance = new CalculGroupBalanceUseCase(groupRepo);
+      groupRepo.findById = vi.fn().mockResolvedValue(null);
+
+      // Act
+      const result = await calculBalance.execute(1);
+
+      // Assert
+      expect(result).toEqual({
+        success: false,
+        error: "Group not found",
+      });
+    });
+  });
+});
