@@ -50,11 +50,13 @@ export class GroupRepositoryInMemory implements GroupRepository {
   async addTransaction(
     group: Group,
     payer: GroupMember,
+    recipients: GroupMember[],
     amount: number
   ): Promise<Group> {
     const transaction = new Transaction(
       this.nextTransactionId,
       payer.id,
+      recipients.map((recipient) => recipient.id),
       amount
     );
     group.transactions.push(transaction);

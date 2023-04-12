@@ -8,6 +8,7 @@ export interface GroupRepository {
   addTransaction: (
     group: Group,
     payer: GroupMember,
+    recipients: GroupMember[],
     amount: number
   ) => Promise<Group>;
 }

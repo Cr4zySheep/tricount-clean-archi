@@ -82,32 +82,36 @@ describe("GroupRepositoryInMemory", () => {
     test("Given a group without transaction, a new transaction should be added to this group with the next transactionId available", async () => {
       // Arrange
       const member = new GroupMember(0, "John");
-      const group = new Group(0, "group0", [member], []);
+      const secondMember = new GroupMember(1, "Dave");
+      const group = new Group(0, "group0", [member, secondMember], []);
       const groupRepo = new GroupRepositoryInMemory([group]);
 
       // Act
-      await groupRepo.addTransaction(group, group.members[0], 1);
+      await groupRepo.addTransaction(
+        group,
+        group.members[0],
+        [group.members[1]],
+        1
+      );
       const updatedGroup = await groupRepo.findById(group.id);
 
       // Assert
-      const expectedResult = new Group(
-        0,
-        "group0",
-        [group.members[0]],
-        [new Transaction(0, group.members[0].id, 1)]
-      );
+      const expectedResult = new Group(0, "group0", group.members, [
+        new Transaction(0, group.members[0].id, [group.members[1].id], 1),
+      ]);
       expect(updatedGroup).toEqual(expectedResult);
     });
 
     test("Given a group with a transaction, a new transaction should be added to this group with the next transactionId available", async () => {
       // Arrange
       const member = new GroupMember(0, "John");
-      const transaction = new Transaction(2, member.id, 1);
+      const secondMember = new GroupMember(1, "Dave");
+      const transaction = new Transaction(2, member.id, [secondMember.id], 1);
       const group = new Group(0, "group0", [member], [transaction]);
       const groupRepo = new GroupRepositoryInMemory([group]);
 
       // Act
-      await groupRepo.addTransaction(group, member, 3);
+      await groupRepo.addTransaction(group, member, [member, secondMember], 3);
       const updatedGroup = await groupRepo.findById(group.id);
 
       // Assert
@@ -115,7 +119,10 @@ describe("GroupRepositoryInMemory", () => {
         0,
         "group0",
         [member],
-        [transaction, new Transaction(3, member.id, 3)]
+        [
+          transaction,
+          new Transaction(3, member.id, [member.id, secondMember.id], 3),
+        ]
       );
       expect(updatedGroup).toStrictEqual(expectedResult);
     });

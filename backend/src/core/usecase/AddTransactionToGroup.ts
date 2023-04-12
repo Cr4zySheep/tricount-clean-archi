@@ -6,6 +6,7 @@ export interface IAddTransactionToGroup {
   execute: (
     groupId: number,
     payerId: number,
+    recipientsId: number[],
     amount: number
   ) => Promise<Result<Group>>;
 }
@@ -23,6 +24,7 @@ export class AddTransactionToGroup implements IAddTransactionToGroup {
   async execute(
     groupId: number,
     payerId: number,
+    recipientsId: number[],
     amount: number
   ): Promise<Result<Group>> {
     const group = await this.groupRepo.findById(groupId);
@@ -47,9 +49,21 @@ export class AddTransactionToGroup implements IAddTransactionToGroup {
       };
     }
 
+    const recipients = group.members.filter((member) =>
+      recipientsId.includes(member.id)
+    );
+
+    if (recipients.length !== recipientsId.length) {
+      return {
+        success: false,
+        error: "One recipient does not belong to the group or is duplicated",
+      };
+    }
+
     const updatedGroup = await this.groupRepo.addTransaction(
       group,
       payer,
+      recipients,
       amount
     );
 

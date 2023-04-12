@@ -22,7 +22,7 @@ describe("Add transaction to group (use case)", () => {
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
-      const result = await addTransactionToGroup.execute(1000, 1000, 1);
+      const result = await addTransactionToGroup.execute(1000, 1000, [999], 1);
 
       // Assert
       expect(result).toStrictEqual({
@@ -43,6 +43,7 @@ describe("Add transaction to group (use case)", () => {
       const result = await addTransactionToGroup.execute(
         group.id,
         anotherUser.id,
+        [user.id],
         1
       );
 
@@ -56,12 +57,18 @@ describe("Add transaction to group (use case)", () => {
     test("Given a group composed of one user, when adding a transaction of 0€ from this user, an error 'Non positive transaction was submitted' should be returned", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
-      const group = new Group(0, "group1", [user], []);
+      const secondUser = new GroupMember(2, "Dave");
+      const group = new Group(0, "group1", [user, secondUser], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
-      const result = await addTransactionToGroup.execute(group.id, user.id, 0);
+      const result = await addTransactionToGroup.execute(
+        group.id,
+        user.id,
+        [secondUser.id],
+        0
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -73,12 +80,18 @@ describe("Add transaction to group (use case)", () => {
     test("Given a group composed of one user, when adding a transaction of -1€ from this user, an error 'Non positive transaction was submitted' should be returned", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
-      const group = new Group(0, "group1", [user], []);
+      const secondUser = new GroupMember(2, "Dave");
+      const group = new Group(0, "group1", [user, secondUser], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
-      const result = await addTransactionToGroup.execute(group.id, user.id, -1);
+      const result = await addTransactionToGroup.execute(
+        group.id,
+        user.id,
+        [secondUser.id],
+        -1
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -86,22 +99,83 @@ describe("Add transaction to group (use case)", () => {
         error: "Non positive transaction was submitted",
       });
     });
-  });
 
-  describe("Happy path", () => {
-    test("Given a group composed of one user, when adding a transaction from this user, it should be successfull", async () => {
+    test("Given a group composed of one user, when adding a transaction from this user to another user, an error 'One recipient does not belong to the group or is duplicated' should be returned", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
+      const otherUser = new GroupMember(2, "Dave");
       const group = new Group(0, "group1", [user], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      groupRepo.addTransaction = vi.fn(async (group, user, amount) => {
-        group.transactions.push(new Transaction(0, user.id, amount));
-        return Promise.resolve(group);
-      });
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
-      const result = await addTransactionToGroup.execute(group.id, user.id, 1);
+      const result = await addTransactionToGroup.execute(
+        group.id,
+        user.id,
+        [otherUser.id],
+        1
+      );
+
+      // Assert
+      expect(result).toStrictEqual({
+        success: false,
+        error: "One recipient does not belong to the group or is duplicated",
+      });
+    });
+
+    test("Given a group composed of two users, when adding a transaction from John to [John, Dave, Dave] , an error 'One recipient does not belong to the group or is duplicated' should be returned", async () => {
+      // Arrange
+      const user = new GroupMember(1, "John");
+      const otherUser = new GroupMember(2, "Dave");
+      const group = new Group(0, "group1", [user, otherUser], []);
+      groupRepo.findById = vi.fn().mockResolvedValue(group);
+      const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
+
+      // Act
+      const result = await addTransactionToGroup.execute(
+        group.id,
+        user.id,
+        [user.id, otherUser.id, otherUser.id],
+        1
+      );
+
+      // Assert
+      expect(result).toStrictEqual({
+        success: false,
+        error: "One recipient does not belong to the group or is duplicated",
+      });
+    });
+  });
+
+  describe("Happy path", () => {
+    test("Given a group composed of two users, when adding a transaction from this user, it should be successfull", async () => {
+      // Arrange
+      const user = new GroupMember(1, "John");
+      const secondUser = new GroupMember(2, "Dave");
+      const group = new Group(0, "group1", [user, secondUser], []);
+      groupRepo.findById = vi.fn().mockResolvedValue(group);
+      groupRepo.addTransaction = vi.fn(
+        async (group, user, recipients, amount) => {
+          group.transactions.push(
+            new Transaction(
+              0,
+              user.id,
+              recipients.map((recipient) => recipient.id),
+              amount
+            )
+          );
+          return Promise.resolve(group);
+        }
+      );
+      const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
+
+      // Act
+      const result = await addTransactionToGroup.execute(
+        group.id,
+        user.id,
+        [secondUser.id],
+        1
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -109,26 +183,41 @@ describe("Add transaction to group (use case)", () => {
         payload: new Group(
           0,
           "group1",
-          [user],
-          [new Transaction(0, user.id, 1)]
+          [user, secondUser],
+          [new Transaction(0, user.id, [secondUser.id], 1)]
         ),
       });
     });
 
-    test("Given a group composed of one user with one transaction, when adding another transaction from this user, it should be successfull", async () => {
+    test("Given a group composed of two users with one transaction, when adding another transaction from this user, it should be successfull", async () => {
       // Arrange
       const user = new GroupMember(1, "John");
-      const transaction = new Transaction(0, user.id, 1);
-      const group = new Group(0, "group1", [user], [transaction]);
+      const secondUser = new GroupMember(2, "Dave");
+      const transaction = new Transaction(0, user.id, [secondUser.id], 1);
+      const group = new Group(0, "group1", [user, secondUser], [transaction]);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      groupRepo.addTransaction = vi.fn(async (group, user, amount) => {
-        group.transactions.push(new Transaction(1, user.id, amount));
-        return Promise.resolve(group);
-      });
+      groupRepo.addTransaction = vi.fn(
+        async (group, user, recipients, amount) => {
+          group.transactions.push(
+            new Transaction(
+              1,
+              user.id,
+              recipients.map((recipient) => recipient.id),
+              amount
+            )
+          );
+          return Promise.resolve(group);
+        }
+      );
       const addTransactionToGroup = new AddTransactionToGroup(groupRepo);
 
       // Act
-      const result = await addTransactionToGroup.execute(group.id, user.id, 7);
+      const result = await addTransactionToGroup.execute(
+        group.id,
+        user.id,
+        [secondUser.id],
+        7
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -136,8 +225,8 @@ describe("Add transaction to group (use case)", () => {
         payload: new Group(
           0,
           "group1",
-          [user],
-          [transaction, new Transaction(1, user.id, 7)]
+          [user, secondUser],
+          [transaction, new Transaction(1, user.id, [secondUser.id], 7)]
         ),
       });
     });
