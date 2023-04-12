@@ -1,6 +1,6 @@
 import { type Result } from "src/utils";
 import type { GroupRepository } from "../repository/GroupRepository";
-import { GroupMember } from "../entity/GroupMember";
+import { type GroupMember } from "../entity/GroupMember";
 
 export interface IRemoveMemberFromGroupUseCase {
   execute: (members: GroupMember[], groupId: number) => Promise<Result<void>>;
@@ -13,10 +13,15 @@ export type RemoveMemberFromGroupUseCaseResponseObject = ReturnType<
   IRemoveMemberFromGroupUseCase["execute"]
 >;
 
-export class RemoveMemberFromGroupUseCase implements IRemoveMemberFromGroupUseCase {
+export class RemoveMemberFromGroupUseCase
+  implements IRemoveMemberFromGroupUseCase
+{
   constructor(private readonly groupRepo: GroupRepository) {}
 
-  async execute( members: GroupMember[], groupId: number): Promise<Result<void>> {
+  async execute(
+    members: GroupMember[],
+    groupId: number
+  ): Promise<Result<void>> {
     const groupFound = await this.groupRepo.findById(groupId);
     if (groupFound == null) {
       return {
@@ -31,10 +36,10 @@ export class RemoveMemberFromGroupUseCase implements IRemoveMemberFromGroupUseCa
       };
     }
     members.forEach((member) => {
-        if (groupFound.members.includes(member)) {
-            const memberIndex = groupFound.members.indexOf(member);
-            groupFound.members.splice(memberIndex, 1);
-        }
+      if (groupFound.members.includes(member)) {
+        const memberIndex = groupFound.members.indexOf(member);
+        groupFound.members.splice(memberIndex, 1);
+      }
     });
 
     await this.groupRepo.save(groupFound);
@@ -45,5 +50,3 @@ export class RemoveMemberFromGroupUseCase implements IRemoveMemberFromGroupUseCa
     };
   }
 }
-
-

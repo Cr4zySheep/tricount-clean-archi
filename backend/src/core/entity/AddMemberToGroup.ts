@@ -1,12 +1,11 @@
-//Calcul group balance
+// Calcul group balance
 import type { Group } from "./Group";
-import { GroupMember } from "./GroupMember";
+import { type GroupMember } from "./GroupMember";
 
 export function addMemberToGroup(members: GroupMember[], group: Group): void {
-    for (const member of members) {
-      if (!group.members.includes(member)) {
-        group.members.push(member);
-      }
+  for (const member of members) {
+    if (!group.members.includes(member)) {
+      group.members.push(member);
     }
+  }
 }
-
