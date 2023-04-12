@@ -1,7 +1,6 @@
 import { type Group } from "../entity/Group";
 import { type GroupRepository } from "../repository/GroupRepository";
 import { type Result } from "src/utils";
-import { type GroupMember } from "../entity/GroupMember";
 
 export interface IAddTransactionToGroup {
   execute: (
@@ -50,7 +49,9 @@ export class AddTransactionToGroup implements IAddTransactionToGroup {
       };
     }
 
-    const recipients = group.members.filter(member => recipientsId.includes(member.id));
+    const recipients = group.members.filter((member) =>
+      recipientsId.includes(member.id)
+    );
 
     if (recipients.length !== recipientsId.length) {
       return {
