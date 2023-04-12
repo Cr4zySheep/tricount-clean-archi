@@ -1,5 +1,21 @@
 # Tricount using Clean Architecture
 
+Welcome to our Tricount project, built using TDD and Clean architecture.
+The goal of the project is to practice and improve our TDD and Clean architecture understandings.
+
+## Core functionment
+
+You can find the organisation of our entities in the entities.png file in the documentation folder.
+For now, we fully developped the V1 of our app, meaning you can create a group, manage members and transactions, compute the balance of each member and compute a simple reimbursement plan.
+
+The next steps would be to :
+- Develop a way to compute more optimized ReimbursementPlans (minimizing the number of actions needed to balance the group)
+- Add a field in Transaction to apply it to a whole group
+- Add descriptions/photos to Transactions
+- Create a user entity that can be linked to multiple group members
+...
+
+
 ## Backend
 
 Technologies:
