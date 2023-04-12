@@ -4,6 +4,8 @@ import { type Static, Type } from "@sinclair/typebox";
 import { RenameGroup } from "src/core/usecase/RenameGroup";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { TransactionController } from "./TransactionController";
+import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
+import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -69,6 +71,29 @@ export const GroupController: FastifyPluginAsync<{
       }
 
       return result.payload;
+    }
+  );
+
+  const computeSimpleReimbursementPlan =
+    new ComputeSimpleReimbursementPlanUsecase(group);
+  fastify.get<{ Params: GroupId }>(
+    "/:id/simple-reimbursement-plan",
+    {
+      schema: {
+        params: GroupIdSchema,
+        tags: ["group"],
+      },
+    },
+    async (request, reply) => {
+      const groupId = request.params.id;
+
+      const result = await computeSimpleReimbursementPlan.execute(groupId);
+
+      if (!result.success) {
+        return reply.status(404).send({ error: result.error });
+      }
+
+      return ReimbursementPlanView.fromEntity(result.payload);
     }
   );
 };

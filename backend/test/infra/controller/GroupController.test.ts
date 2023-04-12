@@ -1,5 +1,10 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import { Group } from "src/core/entity/Group";
+import { ReimbursementPlan } from "src/core/entity/ReimbursementPlan";
+import type {
+  ComputeSimpleReimbursementPlanUsecaseRequestObject,
+  ComputeSimpleReimbursementPlanUsecaseResponseObject,
+} from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
 import {
   type CreateGroupRequestObject,
   type CreateGroupResponseObject,
@@ -9,12 +14,14 @@ import {
   type RenameGroupResponseObject,
 } from "src/core/usecase/RenameGroup";
 import { GroupController } from "src/infra/controller/GroupController";
+import { ReimbursementPlanView } from "src/infra/view/ReimbursementPlanView";
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Warning, using the absolute path doesn't work here
 vi.mock("../../../src/core/usecase/CreateGroup");
 vi.mock("../../../src/core/usecase/RenameGroup");
+vi.mock("../../../src/core/usecase/ComputeSimpleReimbursementPlanUsecase");
 
 describe("GroupController", () => {
   describe("Create group", () => {
@@ -174,6 +181,94 @@ describe("GroupController", () => {
       // Assert
       expect(response.statusCode).toBe(400);
       expect(response.json()).toEqual({ error: "Error message" });
+    });
+  });
+
+  describe("Compute simple reimbursement plan", () => {
+    let server: FastifyInstance;
+    const groupRepo = new GroupRepositoryMock();
+    const computeSimpleReimbursementPlanMock = {
+      execute: vi.fn<
+        ComputeSimpleReimbursementPlanUsecaseRequestObject,
+        ComputeSimpleReimbursementPlanUsecaseResponseObject
+      >(),
+    };
+
+    beforeEach(async () => {
+      const module = await import(
+        "src/core/usecase/ComputeSimpleReimbursementPlanUsecase"
+      );
+      // @ts-expect-error It isn't typed as a Mock
+      module.ComputeSimpleReimbursementPlanUsecase.mockReturnValue(
+        computeSimpleReimbursementPlanMock
+      );
+
+      server = Fastify({ logger: false });
+      await server.register(GroupController, {
+        prefix: "/group",
+        repositories: { group: groupRepo },
+      });
+      await server.ready();
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.resetAllMocks();
+    });
+
+    test("Given an existing group, it should successfully compute a simple reimbursement plan of the group and have status code of 200", async () => {
+      // Arrange
+      const reimbursementPlan = new ReimbursementPlan(
+        0,
+        new Map<number, Map<number, number>>()
+      );
+
+      const reimbursementTransactionsForAMember: Map<number, number> = new Map<
+        number,
+        number
+      >();
+      reimbursementTransactionsForAMember.set(0, 3);
+      reimbursementTransactionsForAMember.set(2, 2);
+      reimbursementPlan.reimbursementPerMemberId.set(
+        1,
+        reimbursementTransactionsForAMember
+      );
+
+      computeSimpleReimbursementPlanMock.execute.mockResolvedValue({
+        success: true,
+        payload: reimbursementPlan,
+      });
+
+      // Act
+      const response = await server.inject({
+        method: "GET",
+        url: "/group/0/simple-reimbursement-plan",
+      });
+
+      // Assert
+      expect(computeSimpleReimbursementPlanMock.execute).toBeCalledWith(0);
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual(
+        ReimbursementPlanView.fromEntity(reimbursementPlan)
+      );
+    });
+
+    test("When the group with groupId is not found, should return a 404 error with the adequate message", async () => {
+      // Arrange
+      computeSimpleReimbursementPlanMock.execute.mockResolvedValue({
+        success: false,
+        error: "Group not found", // TODO : Implement Error interface/enum
+      });
+
+      // Act
+      const response = await server.inject({
+        method: "GET",
+        url: "/group/0/simple-reimbursement-plan",
+      });
+
+      // Assert
+      expect(response.statusCode).toBe(404);
+      expect(response.json()).toEqual({ error: "Group not found" });
     });
   });
 });
