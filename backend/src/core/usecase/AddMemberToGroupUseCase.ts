@@ -1,6 +1,6 @@
 import { type Result } from "src/utils";
 import type { GroupRepository } from "../repository/GroupRepository";
-import { GroupMember } from "../entity/GroupMember";
+import { type GroupMember } from "../entity/GroupMember";
 
 export interface IAddMemberToGroupUseCase {
   execute: (members: GroupMember[], groupId: number) => Promise<Result<void>>;
@@ -16,7 +16,10 @@ export type AddMemberToGroupUseCaseResponseObject = ReturnType<
 export class AddMemberToGroupUseCase implements IAddMemberToGroupUseCase {
   constructor(private readonly groupRepo: GroupRepository) {}
 
-  async execute(members: GroupMember[], groupId: number): Promise<Result<void>> {
+  async execute(
+    members: GroupMember[],
+    groupId: number
+  ): Promise<Result<void>> {
     const groupFound = await this.groupRepo.findById(groupId);
     if (groupFound == null) {
       return {
@@ -39,5 +42,3 @@ export class AddMemberToGroupUseCase implements IAddMemberToGroupUseCase {
     };
   }
 }
-
-
