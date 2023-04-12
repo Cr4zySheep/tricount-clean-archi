@@ -6,8 +6,8 @@ import { type GroupRepository } from "src/core/repository/GroupRepository";
 import { TransactionController } from "./TransactionController";
 import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeSimpleReimbursementPlanUsecase";
 import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
-import { ComputeGroupBalanceUseCase } from "src/core/usecase/ComputeGroupBalanceUseCase";
 import { GroupBalanceView } from "../view/GroupBalance.view";
+import { ComputeGroupBalanceUseCase } from "src/core/usecase/ComputeGroupBalanceUseCase";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
