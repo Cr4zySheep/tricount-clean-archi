@@ -68,30 +68,27 @@ export class ReimbursementPlan {
       throw Error("A reimbursement cannot have a negative amount.");
     }
 
-    const payerReimbursements = this.reimbursementPerMemberId.get(payerId);
-    if (payerReimbursements === undefined) {
-      if (amount === 0) {
+    let payerReimbursements = this.reimbursementPerMemberId.get(payerId);
+    if (amount > 0) {
+      if (payerReimbursements == null) {
+        payerReimbursements = new Map<number, number>();
+        this.reimbursementPerMemberId.set(payerId, payerReimbursements);
+      }
+
+      payerReimbursements.set(payeeId, amount);
+    } else {
+      if (payerReimbursements == null) {
         return;
       }
-      const payerReimbursementToPayee = new Map<number, number>();
-      payerReimbursementToPayee.set(payeeId, amount);
-      this.reimbursementPerMemberId.set(payerId, payerReimbursementToPayee);
-      return;
-    }
 
-    // FIXME : Not really clean, but best way I found yet
-    if (amount === 0) {
-      if (payerReimbursements.get(payeeId) !== undefined) {
+      if (payerReimbursements.has(payeeId)) {
         payerReimbursements.delete(payeeId);
       }
 
       if (payerReimbursements.size === 0) {
         this.reimbursementPerMemberId.delete(payerId);
       }
-      return;
     }
-
-    payerReimbursements.set(payeeId, amount);
   }
 
   private static getReimbursmentOwedByPayerString(
