@@ -63,4 +63,15 @@ export class GroupRepositoryInMemory implements GroupRepository {
     this.nextTransactionId += 1;
     return this.save(group);
   }
+
+  async removeTransaction(
+    group: Group,
+    transaction: Transaction
+  ): Promise<Group> {
+    group.transactions = group.transactions.filter(
+      (currentTransaction) => currentTransaction.id !== transaction.id
+    );
+
+    return this.save(group);
+  }
 }

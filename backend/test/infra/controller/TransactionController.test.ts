@@ -5,6 +5,10 @@ import {
   type AddTransactionToGroupRequestObject,
   type AddTransactionToGroupResponseObject,
 } from "src/core/usecase/AddTransactionToGroup";
+import {
+  type RemoveTransactionToGroupRequestObject,
+  type RemoveTransactionToGroupResponseObject,
+} from "src/core/usecase/RemoveTransactionFromGroup";
 import { TransactionController } from "src/infra/controller/TransactionController";
 
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
@@ -12,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Warning, using the absolute path doesn't work here
 vi.mock("../../../src/core/usecase/AddTransactionToGroup");
+vi.mock("../../../src/core/usecase/RemoveTransactionFromGroup");
 
 describe("TransactionController", () => {
   describe("Add transaction", () => {
@@ -176,7 +181,7 @@ describe("TransactionController", () => {
       expect(response.statusCode).toBe(400);
     });
 
-    test("When CreateGroup returns an error, it should return an error 400 with the same error message", async () => {
+    test("When AddTransaction returns an error, it should return an error 400 with the same error message", async () => {
       // Arrange
       addTransactionToGroupMock.execute.mockResolvedValue({
         success: false,
@@ -188,6 +193,89 @@ describe("TransactionController", () => {
         method: "POST",
         url: `/group/0/transaction`,
         payload: { payerId: 0, recipientsId: [2], amount: 1 },
+      });
+
+      // Assert
+      expect(response.statusCode).toBe(400);
+      expect(response.json()).toEqual({
+        error: "Error message",
+      });
+    });
+  });
+
+  describe("Remove transaction", () => {
+    let server: FastifyInstance;
+    const groupRepo = new GroupRepositoryMock();
+    const removeTransactionToGroupMock = {
+      execute: vi.fn<
+        RemoveTransactionToGroupRequestObject,
+        RemoveTransactionToGroupResponseObject
+      >(),
+    };
+
+    beforeEach(async () => {
+      const module = await import(
+        "src/core/usecase/RemoveTransactionFromGroup"
+      );
+      // @ts-expect-error It isn't typed as a Mock
+      module.RemoveTransactionToGroup.mockReturnValue(
+        removeTransactionToGroupMock
+      );
+
+      // server = await createServer("test");
+      server = Fastify({ logger: false });
+      await server.register(TransactionController, {
+        prefix: `/group/:groupId/transaction`,
+        repositories: { group: groupRepo },
+      });
+      await server.ready();
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.resetAllMocks();
+    });
+
+    test("Given a transaction to remove, it should succeed with a status 200 and return the updated group", async () => {
+      // Arrange
+      removeTransactionToGroupMock.execute.mockResolvedValue({
+        success: true,
+        payload: {
+          id: 0,
+          name: "new group",
+          members: [new GroupMember(0, "John")],
+          transactions: [],
+        },
+      });
+
+      // Act
+      const response = await server.inject({
+        method: "DELETE",
+        url: `/group/0/transaction/0`,
+      });
+
+      // Assert
+      expect(removeTransactionToGroupMock.execute).toBeCalledWith(0, 0);
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({
+        id: 0,
+        name: "new group",
+        members: [new GroupMember(0, "John")],
+        transactions: [],
+      });
+    });
+
+    test("When RemoveTransactionFromGroup returns an error, it should return an error 400 with the same error message", async () => {
+      // Arrange
+      removeTransactionToGroupMock.execute.mockResolvedValue({
+        success: false,
+        error: "Error message",
+      });
+
+      // Act
+      const response = await server.inject({
+        method: "DELETE",
+        url: `/group/0/transaction/0`,
       });
 
       // Assert
