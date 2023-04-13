@@ -15,9 +15,9 @@ import {
   type RenameGroupResponseObject,
 } from "src/core/usecase/RenameGroup";
 import {
-  type CalculGroupBalanceUseCaseRequestObject,
-  type CalculGroupBalanceUseCaseResponseObject,
-} from "src/core/usecase/CalculGroupBalanceUseCase";
+  type ComputeGroupBalanceUseCaseRequestObject,
+  type ComputeGroupBalanceUseCaseResponseObject,
+} from "src/core/usecase/ComputeGroupBalanceUseCase";
 import { GroupController } from "src/infra/controller/GroupController";
 import { ReimbursementPlanView } from "src/infra/view/ReimbursementPlanView";
 import { GroupRepositoryMock } from "test/core/usecase/test-helpers";
@@ -28,7 +28,7 @@ import { GroupBalanceView } from "src/infra/view/GroupBalance.view";
 vi.mock("../../../src/core/usecase/CreateGroup");
 vi.mock("../../../src/core/usecase/RenameGroup");
 vi.mock("../../../src/core/usecase/ComputeSimpleReimbursementPlanUsecase");
-vi.mock("../../../src/core/usecase/CalculGroupBalanceUseCase");
+vi.mock("../../../src/core/usecase/ComputeGroupBalanceUseCase");
 
 describe("GroupController", () => {
   describe("Create group", () => {
@@ -278,20 +278,24 @@ describe("GroupController", () => {
       expect(response.json()).toEqual({ error: "Group not found" });
     });
   });
-  describe("Calcul group balance", () => {
+  describe("Compute group balance", () => {
     let server: FastifyInstance;
     const groupRepo = new GroupRepositoryMock();
-    const calculGroupBalanceMock = {
+    const computeGroupBalanceMock = {
       execute: vi.fn<
-        CalculGroupBalanceUseCaseRequestObject,
-        CalculGroupBalanceUseCaseResponseObject
+        ComputeGroupBalanceUseCaseRequestObject,
+        ComputeGroupBalanceUseCaseResponseObject
       >(),
     };
 
     beforeEach(async () => {
-      const module = await import("src/core/usecase/CalculGroupBalanceUseCase");
+      const module = await import(
+        "src/core/usecase/ComputeGroupBalanceUseCase"
+      );
       // @ts-expect-error It isn't typed as a Mock
-      module.CalculGroupBalanceUseCase.mockReturnValue(calculGroupBalanceMock);
+      module.ComputeGroupBalanceUseCase.mockReturnValue(
+        computeGroupBalanceMock
+      );
 
       // server = await createServer("test");
       server = Fastify({ logger: false });
@@ -311,7 +315,7 @@ describe("GroupController", () => {
       // Arrange
       const balanceMapTest = new Map<number, number>();
       balanceMapTest.set(0, 1);
-      calculGroupBalanceMock.execute.mockResolvedValue({
+      computeGroupBalanceMock.execute.mockResolvedValue({
         success: true,
         payload: new GroupBalance(0, balanceMapTest),
       });
@@ -319,11 +323,11 @@ describe("GroupController", () => {
       // Act
       const response = await server.inject({
         method: "POST",
-        url: "/group/0/calculBalance",
+        url: "/group/0/computeBalance",
       });
 
       // Assert
-      expect(calculGroupBalanceMock.execute).toBeCalledWith(0);
+      expect(computeGroupBalanceMock.execute).toBeCalledWith(0);
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual(
         GroupBalanceView.fromGroupBalance(new GroupBalance(0, balanceMapTest))

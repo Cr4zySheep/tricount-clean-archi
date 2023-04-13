@@ -1,15 +1,13 @@
-import type { Group } from "./Group";
-import { GroupBalance } from "./GroupBalance";
-import { type Transaction } from "./Transaction";
+import type { Group } from "../entity/Group";
+import { GroupBalance } from "../entity/GroupBalance";
+import type { Transaction } from "../entity/Transaction";
 
-export class CalculGroupBalance {
-  calcul(group: Group): GroupBalance {
-    const memberIds = Array.from(group.members.keys());
+export function computeGroupBalance(group: Group): GroupBalance {
+  const memberIds = group.members.map((member) => member.id);
 
-    const result = computeBalancePerMemberId(memberIds, group.transactions);
+  const result = computeBalancePerMemberId(memberIds, group.transactions);
 
-    return new GroupBalance(group.id, result);
-  }
+  return new GroupBalance(group.id, result);
 }
 
 function computeBalancePerMemberId(

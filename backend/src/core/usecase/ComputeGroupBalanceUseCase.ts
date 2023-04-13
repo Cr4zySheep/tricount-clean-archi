@@ -1,20 +1,20 @@
 import { type Result } from "src/utils";
 import type { GroupRepository } from "../repository/GroupRepository";
 import type { GroupBalance } from "../entity/GroupBalance";
-import { CalculGroupBalance } from "../entity/CalculGroupBalance";
+import { computeGroupBalance } from "../behaviour/computeGroupBalance";
 
-export interface ICalculGroupBalanceUseCase {
+export interface IComputeGroupBalanceUseCase {
   execute: (id: number) => Promise<Result<GroupBalance>>;
 }
 
-export type CalculGroupBalanceUseCaseRequestObject = Parameters<
-  ICalculGroupBalanceUseCase["execute"]
+export type ComputeGroupBalanceUseCaseRequestObject = Parameters<
+  IComputeGroupBalanceUseCase["execute"]
 >;
-export type CalculGroupBalanceUseCaseResponseObject = ReturnType<
-  ICalculGroupBalanceUseCase["execute"]
+export type ComputeGroupBalanceUseCaseResponseObject = ReturnType<
+  IComputeGroupBalanceUseCase["execute"]
 >;
 
-export class CalculGroupBalanceUseCase implements ICalculGroupBalanceUseCase {
+export class ComputeGroupBalanceUseCase implements IComputeGroupBalanceUseCase {
   constructor(private readonly groupRepo: GroupRepository) {}
 
   async execute(groupId: number): Promise<Result<GroupBalance>> {
@@ -26,7 +26,7 @@ export class CalculGroupBalanceUseCase implements ICalculGroupBalanceUseCase {
       };
     }
 
-    const groupBalance = new CalculGroupBalance().calcul(groupFound);
+    const groupBalance = computeGroupBalance(groupFound);
 
     return {
       success: true,

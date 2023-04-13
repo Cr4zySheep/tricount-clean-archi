@@ -1,11 +1,11 @@
 import { Group } from "src/core/entity/Group";
 import { describe, test, expect, beforeEach } from "vitest";
 import { GroupBalance } from "src/core/entity/GroupBalance";
-import { CalculGroupBalance } from "src/core/entity/CalculGroupBalance";
+import { computeGroupBalance } from "src/core/behaviour/computeGroupBalance";
 import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
 
-describe("Calcul group balance (entity)", () => {
+describe("Compute group balance (entity)", () => {
   let members: GroupMember[];
   describe("Happy path", () => {
     describe("V0, transactions for the whole group ", () => {
@@ -20,7 +20,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -39,7 +39,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -58,7 +58,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -87,7 +87,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -107,7 +107,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -127,7 +127,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -154,7 +154,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -174,7 +174,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -203,7 +203,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -230,7 +230,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -249,7 +249,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -262,7 +262,56 @@ describe("Calcul group balance (entity)", () => {
           expect(result).toEqual(expectedResult);
         });
       });
+      describe("Given a group of two members that with two transactions", () => {
+        beforeEach(() => {
+          members = [new GroupMember(0, "Luc"), new GroupMember(1, "Jessica")];
+        });
+        test("with transaction 1 :payerId 1 and amount 3 for whole group, transaction 2 :payerId 1 and amount 1 for member 0, it should return a balance {0 :-2.5,1 :2.5}.", async () => {
+          // Arrange
+          const group = new Group(1, "group", members, [
+            new Transaction(1, 1, [0, 1], 3),
+            new Transaction(2, 1, [0], 1),
+          ]);
 
+          // Act
+          const result = computeGroupBalance(group);
+
+          // Assert
+          const expectedResult = new GroupBalance(
+            1,
+            new Map<number, number>([
+              [0, -2.5],
+              [1, 2.5],
+            ])
+          );
+          expect(result).toEqual(expectedResult);
+        });
+      });
+      describe("Given a group of two members with membersId starting at 1", () => {
+        beforeEach(() => {
+          members = [new GroupMember(1, "Luc"), new GroupMember(2, "Jessica")];
+        });
+        test("with transaction 1 :payerId 1 and amount 3 for whole group, transaction 2 :payerId 1 and amount 1 for member 2, it should return a balance {1 : 2.5, 2 : -2.5}.", async () => {
+          // Arrange
+          const group = new Group(1, "group", members, [
+            new Transaction(1, 1, [1, 2], 3),
+            new Transaction(2, 1, [2], 1),
+          ]);
+
+          // Act
+          const result = computeGroupBalance(group);
+
+          // Assert
+          const expectedResult = new GroupBalance(
+            1,
+            new Map<number, number>([
+              [1, 2.5],
+              [2, -2.5],
+            ])
+          );
+          expect(result).toEqual(expectedResult);
+        });
+      });
       describe("Given a group of three members with one transaction", () => {
         beforeEach(() => {
           members = [
@@ -278,7 +327,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -298,7 +347,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -328,7 +377,7 @@ describe("Calcul group balance (entity)", () => {
           ]);
 
           // Act
-          const result = new CalculGroupBalance().calcul(group);
+          const result = computeGroupBalance(group);
 
           // Assert
           const expectedResult = new GroupBalance(
@@ -355,7 +404,7 @@ describe("Calcul group balance (entity)", () => {
       );
 
       // Act
-      const result = new CalculGroupBalance().calcul(group);
+      const result = computeGroupBalance(group);
 
       // Assert
       const expectedResult = new GroupBalance(1, new Map<number, number>());
@@ -371,7 +420,7 @@ describe("Calcul group balance (entity)", () => {
 
       // Act
       const group = new Group(1, "group", members, []);
-      const result = new CalculGroupBalance().calcul(group);
+      const result = computeGroupBalance(group);
 
       // Assert
       const expectedResult = new GroupBalance(
