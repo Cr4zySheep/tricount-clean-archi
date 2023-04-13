@@ -1,6 +1,6 @@
 import type { Group } from "../entity/Group";
 import { GroupBalance } from "../entity/GroupBalance";
-import { type Transaction } from "../entity/Transaction";
+import type { Transaction } from "../entity/Transaction";
 
 export function computeGroupBalance(group: Group): GroupBalance {
   const memberIds = group.members.map((member) => member.id);

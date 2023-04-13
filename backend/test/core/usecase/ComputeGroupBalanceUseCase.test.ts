@@ -28,23 +28,6 @@ describe("Compute balance (use case)", () => {
         ],
         [new Transaction(1, 1, [1, 2], 3), new Transaction(2, 1, [2], 1)]
       );
-      groupRepo.findById = vi.fn().mockResolvedValue(group);
-      const mock = vi.fn().mockImplementation(computeGroupBalance);
-      mock.mockImplementation(
-        () =>
-          new GroupBalance(
-            0,
-            new Map<number, number>([
-              [1, 2.5],
-              [2, -2.5],
-            ])
-          )
-      );
-
-      // Act
-      const result = await computeBalance.execute(0);
-
-      // Assert
       const expectedGroupBalance = new GroupBalance(
         0,
         new Map<number, number>([
@@ -52,6 +35,14 @@ describe("Compute balance (use case)", () => {
           [2, -2.5],
         ])
       );
+      groupRepo.findById = vi.fn().mockResolvedValue(group);
+      const mock = vi.fn().mockImplementation(computeGroupBalance);
+      mock.mockImplementation(() => expectedGroupBalance);
+
+      // Act
+      const result = await computeBalance.execute(0);
+
+      // Assert
       expect(result).toEqual({
         success: true,
         payload: expectedGroupBalance,
