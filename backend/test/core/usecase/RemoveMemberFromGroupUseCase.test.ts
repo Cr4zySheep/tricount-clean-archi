@@ -21,9 +21,7 @@ describe("Remove a member to a group (usecase)", () => {
       const group = new Group(2, "groupName", [member], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
-      groupRepo.removeMember = vi.fn(async (memberId, group) => {
-        return Promise.resolve(new Group(2, "groupName", [], []));
-      });
+      groupRepo.removeMember = vi.fn().mockResolvedValue(new Group(2, "groupName", [], []));
       const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(
         groupRepo
       );
