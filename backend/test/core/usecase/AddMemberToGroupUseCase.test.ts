@@ -21,8 +21,9 @@ describe("Add a member to a group (usecase)", () => {
       const group = new Group(2, "groupName", [member], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
-      groupRepo.addMember = vi.fn().mockResolvedValue(new Group(2, "groupName", [member, testMember], [])
-);
+      groupRepo.addMember = vi
+        .fn()
+        .mockResolvedValue(new Group(2, "groupName", [member, testMember], []));
       const addMemberToGroupUseCase = new AddMemberToGroupUseCase(groupRepo);
 
       // Act
