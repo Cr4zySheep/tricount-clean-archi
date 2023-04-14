@@ -5,23 +5,49 @@ import { GroupRepositoryMock } from "./test-helpers";
 import { RemoveMemberFromGroupUseCase } from "src/core/usecase/RemoveMemberFromGroupUseCase";
 import { GroupMember } from "src/core/entity/GroupMember";
 
-describe("Remove member from a group (usecase)", () => {
+describe("Remove a member to a group (usecase)", () => {
   let groupRepo: GroupRepository;
-  let testMembers: GroupMember[];
+  let testMember: GroupMember;
 
   beforeEach(() => {
     groupRepo = new GroupRepositoryMock();
-    testMembers = [new GroupMember(0, "Luc"), new GroupMember(1, "Jessica")];
+    testMember = new GroupMember(0, "Pierre");
   });
 
-  describe("Unhappy path", () => {
-    test("Given a false group id, when removing a member to a non existing group, an error 'Group not found' should be returned", async () => {
+  describe("Happy path", () => {
+    test("Given a existing group id, when removing a existing member, it should return the updated group", async () => {
       // Arrange
-      groupRepo.findById = vi.fn().mockResolvedValue(null);
-      const removeMemberFromGroup = new RemoveMemberFromGroupUseCase(groupRepo);
+      const member = new GroupMember(1, "John")
+      const group = new Group(2, "groupName", [member], [])
+      groupRepo.findById = vi.fn().mockResolvedValue(group);
+      groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
+      groupRepo.removeMember = vi.fn(async (memberId, group) => {
+        return Promise.resolve(new Group(2, "groupName", [], []));
+      });
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
+
 
       // Act
-      const result = await removeMemberFromGroup.execute(testMembers, 9999);
+      const result = await removeMemberFromGroupUseCase.execute(member.id, group.id);
+
+      // Assert
+      expect(groupRepo.removeMember).toBeCalledWith(member.id, group);
+      expect(result).toStrictEqual({
+        success: true,
+        payload: new Group(2, "groupName", [], []),
+      });
+    });
+
+  })
+
+  describe("Unhappy path", () => {
+    test("Given a false group id, when removing a member from a non existing group, an error 'Group not found' should be returned", async () => {
+      // Arrange
+      groupRepo.findById = vi.fn().mockResolvedValue(null);
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
+
+      // Act
+      const result = await removeMemberFromGroupUseCase.execute(testMember.id, 1000);
 
       // Assert
       expect(result).toStrictEqual({
@@ -30,20 +56,40 @@ describe("Remove member from a group (usecase)", () => {
       });
     });
 
-    test("Given a group with 0 members, when removing a member, an error 'No members in group' should be raised", async () => {
+    test("Given a empty group, when removing a member an error 'No members in group' should be returned", async () => {
       // Arrange
-      const member = [testMembers[0]];
-      const group = new Group(0, "group", [], []);
+      const group = new Group(2, "groupName", [], [])
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      const removeMemberFromGroup = new RemoveMemberFromGroupUseCase(groupRepo);
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
 
       // Act
-      const result = await removeMemberFromGroup.execute(member, group.id);
+      const result = await removeMemberFromGroupUseCase.execute(testMember.id, group.id);
 
       // Assert
       expect(result).toStrictEqual({
         success: false,
         error: "No members in group",
+      });
+    });
+
+    test("Given a non empty group, when removing a non existing member an error 'Member does not exist' should be returned", async () => {
+      // Arrange
+      const member = new GroupMember(1, "John")
+      const group = new Group(2, "groupName", [member], [])
+      groupRepo.findById = vi.fn().mockResolvedValue(group);
+      groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
+      groupRepo.removeMember = vi.fn(async (memberId, group) => {
+        return Promise.resolve(new Group(0, "group1", [], []));
+      });
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
+
+      // Act
+      const result = await removeMemberFromGroupUseCase.execute(testMember.id, group.id);
+
+      // Assert
+      expect(result).toStrictEqual({
+        success: false,
+        error: "Member does not exist",
       });
     });
   });

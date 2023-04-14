@@ -1,9 +1,9 @@
+import { type Group } from "../entity/Group";
 import { type Result } from "src/utils";
 import type { GroupRepository } from "../repository/GroupRepository";
-import { type GroupMember } from "../entity/GroupMember";
 
 export interface IRemoveMemberFromGroupUseCase {
-  execute: (members: GroupMember[], groupId: number) => Promise<Result<void>>;
+  execute: (memberId: number, groupId: number) => Promise<Result<Group>>;
 }
 
 export type RemoveMemberFromGroupUseCaseRequestObject = Parameters<
@@ -19,34 +19,39 @@ export class RemoveMemberFromGroupUseCase
   constructor(private readonly groupRepo: GroupRepository) {}
 
   async execute(
-    members: GroupMember[],
+    memberId: number,
     groupId: number
-  ): Promise<Result<void>> {
-    const groupFound = await this.groupRepo.findById(groupId);
-    if (groupFound == null) {
+  ): Promise<Result<Group>> {
+    const group = await this.groupRepo.findById(groupId);
+    if (group == null) {
       return {
         success: false,
         error: "Group not found",
       };
     }
-    if (groupFound.members.length === 0) {
+    if (group.members.length === 0) {
       return {
         success: false,
         error: "No members in group",
       };
     }
-    members.forEach((member) => {
-      if (groupFound.members.includes(member)) {
-        const memberIndex = groupFound.members.indexOf(member);
-        groupFound.members.splice(memberIndex, 1);
-      }
+    const member = group.members.find((member) => {
+      return member.id === memberId;
     });
+    if (member == null) {
+      return {
+        success: false,
+        error: "Member does not exist",
+      };
+    };
 
-    await this.groupRepo.save(groupFound);
-
+    const updatedGroup = await this.groupRepo.removeMember(
+      memberId,
+      group
+    );
     return {
       success: true,
-      payload: undefined,
-    };
+      payload: updatedGroup,
+    };;
   }
 }
