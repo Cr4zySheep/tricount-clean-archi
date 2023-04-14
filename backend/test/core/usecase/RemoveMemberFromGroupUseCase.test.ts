@@ -17,18 +17,22 @@ describe("Remove a member to a group (usecase)", () => {
   describe("Happy path", () => {
     test("Given a existing group id, when removing a existing member, it should return the updated group", async () => {
       // Arrange
-      const member = new GroupMember(1, "John")
-      const group = new Group(2, "groupName", [member], [])
+      const member = new GroupMember(1, "John");
+      const group = new Group(2, "groupName", [member], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       groupRepo.removeMember = vi.fn(async (memberId, group) => {
         return Promise.resolve(new Group(2, "groupName", [], []));
       });
-      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
-
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(
+        groupRepo
+      );
 
       // Act
-      const result = await removeMemberFromGroupUseCase.execute(member.id, group.id);
+      const result = await removeMemberFromGroupUseCase.execute(
+        member.id,
+        group.id
+      );
 
       // Assert
       expect(groupRepo.removeMember).toBeCalledWith(member.id, group);
@@ -37,17 +41,21 @@ describe("Remove a member to a group (usecase)", () => {
         payload: new Group(2, "groupName", [], []),
       });
     });
-
-  })
+  });
 
   describe("Unhappy path", () => {
     test("Given a false group id, when removing a member from a non existing group, an error 'Group not found' should be returned", async () => {
       // Arrange
       groupRepo.findById = vi.fn().mockResolvedValue(null);
-      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(
+        groupRepo
+      );
 
       // Act
-      const result = await removeMemberFromGroupUseCase.execute(testMember.id, 1000);
+      const result = await removeMemberFromGroupUseCase.execute(
+        testMember.id,
+        1000
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -58,12 +66,17 @@ describe("Remove a member to a group (usecase)", () => {
 
     test("Given a empty group, when removing a member an error 'No members in group' should be returned", async () => {
       // Arrange
-      const group = new Group(2, "groupName", [], [])
+      const group = new Group(2, "groupName", [], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
-      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(
+        groupRepo
+      );
 
       // Act
-      const result = await removeMemberFromGroupUseCase.execute(testMember.id, group.id);
+      const result = await removeMemberFromGroupUseCase.execute(
+        testMember.id,
+        group.id
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -74,17 +87,22 @@ describe("Remove a member to a group (usecase)", () => {
 
     test("Given a non empty group, when removing a non existing member an error 'Member does not exist' should be returned", async () => {
       // Arrange
-      const member = new GroupMember(1, "John")
-      const group = new Group(2, "groupName", [member], [])
+      const member = new GroupMember(1, "John");
+      const group = new Group(2, "groupName", [member], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       groupRepo.removeMember = vi.fn(async (memberId, group) => {
         return Promise.resolve(new Group(0, "group1", [], []));
       });
-      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(groupRepo);
+      const removeMemberFromGroupUseCase = new RemoveMemberFromGroupUseCase(
+        groupRepo
+      );
 
       // Act
-      const result = await removeMemberFromGroupUseCase.execute(testMember.id, group.id);
+      const result = await removeMemberFromGroupUseCase.execute(
+        testMember.id,
+        group.id
+      );
 
       // Assert
       expect(result).toStrictEqual({

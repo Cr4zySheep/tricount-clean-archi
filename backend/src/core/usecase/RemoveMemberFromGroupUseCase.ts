@@ -18,10 +18,7 @@ export class RemoveMemberFromGroupUseCase
 {
   constructor(private readonly groupRepo: GroupRepository) {}
 
-  async execute(
-    memberId: number,
-    groupId: number
-  ): Promise<Result<Group>> {
+  async execute(memberId: number, groupId: number): Promise<Result<Group>> {
     const group = await this.groupRepo.findById(groupId);
     if (group == null) {
       return {
@@ -43,15 +40,12 @@ export class RemoveMemberFromGroupUseCase
         success: false,
         error: "Member does not exist",
       };
-    };
+    }
 
-    const updatedGroup = await this.groupRepo.removeMember(
-      memberId,
-      group
-    );
+    const updatedGroup = await this.groupRepo.removeMember(memberId, group);
     return {
       success: true,
       payload: updatedGroup,
-    };;
+    };
   }
 }

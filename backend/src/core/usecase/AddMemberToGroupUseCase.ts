@@ -16,10 +16,7 @@ export type AddMemberToGroupUseCaseResponseObject = ReturnType<
 export class AddMemberToGroupUseCase implements IAddMemberToGroupUseCase {
   constructor(private readonly groupRepo: GroupRepository) {}
 
-  async execute(
-    username: string,
-    groupId: number
-  ): Promise<Result<Group>> {
+  async execute(username: string, groupId: number): Promise<Result<Group>> {
     const group = await this.groupRepo.findById(groupId);
     if (group == null) {
       return {
@@ -34,10 +31,7 @@ export class AddMemberToGroupUseCase implements IAddMemberToGroupUseCase {
       };
     }
 
-    const updateGroup = await this.groupRepo.addMember(
-      username,
-      group
-    );
+    const updateGroup = await this.groupRepo.addMember(username, group);
     return {
       success: true,
       payload: updateGroup,
