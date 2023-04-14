@@ -1,9 +1,9 @@
+import { type Group } from "../entity/Group";
 import { type Result } from "src/utils";
 import type { GroupRepository } from "../repository/GroupRepository";
-import { type GroupMember } from "../entity/GroupMember";
 
 export interface IAddMemberToGroupUseCase {
-  execute: (members: GroupMember[], groupId: number) => Promise<Result<void>>;
+  execute: (username: string, groupId: number) => Promise<Result<Group>>;
 }
 
 export type AddMemberToGroupUseCaseRequestObject = Parameters<
@@ -17,28 +17,30 @@ export class AddMemberToGroupUseCase implements IAddMemberToGroupUseCase {
   constructor(private readonly groupRepo: GroupRepository) {}
 
   async execute(
-    members: GroupMember[],
+    username: string,
     groupId: number
-  ): Promise<Result<void>> {
-    const groupFound = await this.groupRepo.findById(groupId);
-    if (groupFound == null) {
+  ): Promise<Result<Group>> {
+    const group = await this.groupRepo.findById(groupId);
+    if (group == null) {
       return {
         success: false,
         error: "Group not found",
       };
     }
+    if (username.length === 0) {
+      return {
+        success: false,
+        error: "Empty username",
+      };
+    }
 
-    members.forEach((member) => {
-      if (!groupFound.members.includes(member)) {
-        groupFound.members.push(member);
-      }
-    });
-
-    await this.groupRepo.save(groupFound);
-
+    const updateGroup = await this.groupRepo.addMember(
+      username,
+      group
+    );
     return {
       success: true,
-      payload: undefined,
+      payload: updateGroup,
     };
   }
 }
