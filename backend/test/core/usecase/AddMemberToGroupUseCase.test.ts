@@ -22,12 +22,17 @@ describe("Add a member to a group (usecase)", () => {
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       groupRepo.save = vi.fn(async (group) => Promise.resolve(group));
       groupRepo.addMember = vi.fn(async (memberName, group) => {
-        return Promise.resolve(new Group(2, "groupName", [member, testMember], []));
+        return Promise.resolve(
+          new Group(2, "groupName", [member, testMember], [])
+        );
       });
       const addMemberToGroupUseCase = new AddMemberToGroupUseCase(groupRepo);
 
       // Act
-      const result = await addMemberToGroupUseCase.execute(testMember.name, group.id);
+      const result = await addMemberToGroupUseCase.execute(
+        testMember.name,
+        group.id
+      );
 
       // Assert
       expect(groupRepo.addMember).toBeCalledWith(testMember.name, group);
@@ -36,8 +41,7 @@ describe("Add a member to a group (usecase)", () => {
         payload: new Group(2, "groupName", [member, testMember], []),
       });
     });
-
-  })
+  });
 
   describe("Unhappy path", () => {
     test("Given a false group id, when adding a member to a non existing group, an error 'Group not found' should be returned", async () => {
@@ -46,7 +50,10 @@ describe("Add a member to a group (usecase)", () => {
       const addMemberToGroupUseCase = new AddMemberToGroupUseCase(groupRepo);
 
       // Act
-      const result = await addMemberToGroupUseCase.execute(testMember.name, 9999);
+      const result = await addMemberToGroupUseCase.execute(
+        testMember.name,
+        9999
+      );
 
       // Assert
       expect(result).toStrictEqual({
@@ -57,7 +64,7 @@ describe("Add a member to a group (usecase)", () => {
 
     test("Given a invalid (empty) username, an error 'Empty username' should be returned", async () => {
       // Arrange
-      const group = new Group(2, "groupName", [], [])
+      const group = new Group(2, "groupName", [], []);
       groupRepo.findById = vi.fn().mockResolvedValue(group);
       const addMemberToGroupUseCase = new AddMemberToGroupUseCase(groupRepo);
 

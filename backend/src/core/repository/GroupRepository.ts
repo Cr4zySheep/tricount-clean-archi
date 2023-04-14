@@ -7,15 +7,9 @@ export interface GroupRepository {
   findById: (id: number) => Promise<Group | null>;
   save: (group: Group) => Promise<Group>;
 
-  addMember: (
-    username: string,
-    group: Group
-  ) => Promise<Group>;
+  addMember: (username: string, group: Group) => Promise<Group>;
 
-  removeMember: (
-    memberId: number,
-    group: Group
-  ) => Promise<Group>;
+  removeMember: (memberId: number, group: Group) => Promise<Group>;
 
   addTransaction: (
     group: Group,
@@ -24,9 +18,5 @@ export interface GroupRepository {
     amount: number
   ) => Promise<Group>;
 
-  removeTransaction: (
-    group: Group,
-    transaction: Transaction
-    ) => Promise<Group>;
+  removeTransaction: (group: Group, transaction: Transaction) => Promise<Group>;
 }
-  

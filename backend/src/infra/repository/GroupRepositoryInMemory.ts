@@ -18,20 +18,22 @@ export class GroupRepositoryInMemory implements GroupRepository {
             (currentId, group) => Math.max(currentId, group.id),
             -1
           ) + 1
-        : 0;     
+        : 0;
 
     this.nextMemberId =
-        initialGroups != null
-          ? initialGroups.reduce(
-              (currentId, group) =>
-                Math.max(
-                  currentId,
-                  group.members.reduce((max, member) => Math.max(max, member.id), -1)
-                ),
-              -1
-            ) + 1
-          : 0;
-  
+      initialGroups != null
+        ? initialGroups.reduce(
+            (currentId, group) =>
+              Math.max(
+                currentId,
+                group.members.reduce(
+                  (max, member) => Math.max(max, member.id),
+                  -1
+                )
+              ),
+            -1
+          ) + 1
+        : 0;
 
     const membersIds = this.groups
       .flatMap((group) => group.members)
@@ -69,23 +71,14 @@ export class GroupRepositoryInMemory implements GroupRepository {
     return this.groups[idx];
   }
 
-  async addMember(
-    username: string,
-    group: Group,
-  ): Promise<Group> {
-    const member = new GroupMember(
-      this.nextMemberId,
-      username
-    );
+  async addMember(username: string, group: Group): Promise<Group> {
+    const member = new GroupMember(this.nextMemberId, username);
     group.members.push(member);
     this.nextMemberId += 1;
     return this.save(group);
   }
 
-  async removeMember(
-    memberId: number,
-    group: Group,
-  ): Promise<Group> {
+  async removeMember(memberId: number, group: Group): Promise<Group> {
     group.members = group.members.filter(
       (currentMember) => currentMember.id !== memberId
     );
