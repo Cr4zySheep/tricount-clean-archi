@@ -31,10 +31,10 @@ export class AddMemberToGroupUseCase implements IAddMemberToGroupUseCase {
       };
     }
 
-    const updateGroup = await this.groupRepo.addMember(username, group);
+    const updatedGroup = await this.groupRepo.addMember(username, group);
     return {
       success: true,
-      payload: updateGroup,
+      payload: updatedGroup,
     };
   }
 }
