@@ -6,6 +6,10 @@ export interface GroupRepository {
   create: (name: string) => Promise<Group>;
   findById: (id: number) => Promise<Group | null>;
   save: (group: Group) => Promise<Group>;
+
+  addMember: (username: string, group: Group) => Promise<Group>;
+  removeMember: (memberId: number, group: Group) => Promise<Group>;
+
   addTransaction: (
     group: Group,
     payer: GroupMember,

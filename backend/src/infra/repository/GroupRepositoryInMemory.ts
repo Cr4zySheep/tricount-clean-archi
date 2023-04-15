@@ -1,22 +1,31 @@
 import { Group } from "src/core/entity/Group";
-import { type GroupMember } from "src/core/entity/GroupMember";
+import { GroupMember } from "src/core/entity/GroupMember";
 import { Transaction } from "src/core/entity/Transaction";
 import { type GroupRepository } from "src/core/repository/GroupRepository";
 
 export class GroupRepositoryInMemory implements GroupRepository {
   private readonly groups: Group[];
-  private nextId: number;
+  private nextGroupId: number;
+  private nextMemberId: number;
   private nextTransactionId: number;
 
   constructor(initialGroups?: Group[]) {
     this.groups = initialGroups ?? [];
-    this.nextId =
+
+    this.nextGroupId =
       initialGroups != null
         ? initialGroups.reduce(
             (currentId, group) => Math.max(currentId, group.id),
             -1
           ) + 1
         : 0;
+
+    const membersIds = this.groups
+      .flatMap((group) => group.members)
+      .map((member) => member.id);
+    this.nextMemberId =
+      membersIds.length === 0 ? 0 : Math.max(...membersIds) + 1;
+
     const transactionIds = this.groups
       .flatMap((group) => group.transactions)
       .map((transaction) => transaction.id);
@@ -25,9 +34,9 @@ export class GroupRepositoryInMemory implements GroupRepository {
   }
 
   async create(name: string): Promise<Group> {
-    const group = new Group(this.nextId, name, [], []);
+    const group = new Group(this.nextGroupId, name, [], []);
     this.groups.push(group);
-    this.nextId += 1;
+    this.nextGroupId += 1;
     return group;
   }
 
@@ -45,6 +54,21 @@ export class GroupRepositoryInMemory implements GroupRepository {
     this.groups[idx] = updatedGroup;
 
     return this.groups[idx];
+  }
+
+  async addMember(username: string, group: Group): Promise<Group> {
+    const member = new GroupMember(this.nextMemberId, username);
+    group.members.push(member);
+    this.nextMemberId += 1;
+    return this.save(group);
+  }
+
+  async removeMember(memberId: number, group: Group): Promise<Group> {
+    group.members = group.members.filter(
+      (currentMember) => currentMember.id !== memberId
+    );
+
+    return this.save(group);
   }
 
   async addTransaction(
