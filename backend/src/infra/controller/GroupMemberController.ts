@@ -33,7 +33,7 @@ export const GroupMemberController: FastifyPluginAsync<{
         params: GroupIdSchema,
         body: AddMemberInputSchema,
         description: "Add a member to an existing group",
-        tags: ["group"],
+        tags: ["group-member"],
       },
     },
     async (request, reply) => {
@@ -57,7 +57,7 @@ export const GroupMemberController: FastifyPluginAsync<{
       schema: {
         params: RemoveMemberParamsSchema,
         description: "Remove a member from a group",
-        tags: ["group", "member"],
+        tags: ["group-member"],
       },
     },
     async (request, reply) => {

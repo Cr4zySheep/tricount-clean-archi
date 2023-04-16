@@ -43,7 +43,13 @@ export const GroupController: FastifyPluginAsync<{
   const createGroup = new CreateGroup(group);
   fastify.post<{ Body: CreateGroupInput }>(
     "/",
-    { schema: { body: CreateGroupInputSchema, tags: ["group"] } },
+    {
+      schema: {
+        body: CreateGroupInputSchema,
+        tags: ["group"],
+        description: "Create a new group",
+      },
+    },
     async (request, reply) => {
       const { name } = request.body;
 
