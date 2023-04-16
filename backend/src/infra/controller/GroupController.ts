@@ -8,6 +8,7 @@ import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeS
 import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
 import { GroupBalanceView } from "../view/GroupBalance.view";
 import { ComputeGroupBalanceUseCase } from "src/core/usecase/ComputeGroupBalanceUseCase";
+import { GroupMemberController } from "./GroupMemberController";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -29,6 +30,10 @@ export const GroupController: FastifyPluginAsync<{
 }> = async (fastify: FastifyInstance, options): Promise<void> => {
   await fastify.register(TransactionController, {
     prefix: "/:groupId/transaction",
+    repositories: options.repositories,
+  });
+  await fastify.register(GroupMemberController, {
+    prefix: "/:groupId/member",
     repositories: options.repositories,
   });
 
