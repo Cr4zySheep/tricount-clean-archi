@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance } from "fastify";
 import { GroupController } from "../controller/GroupController";
 import FastifySwagger from "@fastify/swagger";
 import FastifySwaggerUI from "@fastify/swagger-ui";
+import FastifyCors from "@fastify/cors";
 import { createRepositories } from "../repository/createRepositories";
 
 const envToLogger = {
@@ -48,6 +49,7 @@ export async function createServer(
   await server.register(FastifySwaggerUI, {
     routePrefix: "/docs",
   });
+  await server.register(FastifyCors, {});
 
   // * App plugins
 
