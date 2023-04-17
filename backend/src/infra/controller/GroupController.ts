@@ -8,6 +8,8 @@ import { ComputeSimpleReimbursementPlanUsecase } from "src/core/usecase/ComputeS
 import { ReimbursementPlanView } from "../view/ReimbursementPlanView";
 import { GroupBalanceView } from "../view/GroupBalance.view";
 import { ComputeGroupBalanceUseCase } from "src/core/usecase/ComputeGroupBalanceUseCase";
+import { GroupMemberController } from "./GroupMemberController";
+import { GetGroup } from "src/core/usecase/GetGroup";
 
 const CreateGroupInputSchema = Type.Object({
   name: Type.String(),
@@ -31,13 +33,23 @@ export const GroupController: FastifyPluginAsync<{
     prefix: "/:groupId/transaction",
     repositories: options.repositories,
   });
+  await fastify.register(GroupMemberController, {
+    prefix: "/:groupId/member",
+    repositories: options.repositories,
+  });
 
   const { group } = options.repositories;
 
   const createGroup = new CreateGroup(group);
   fastify.post<{ Body: CreateGroupInput }>(
     "/",
-    { schema: { body: CreateGroupInputSchema, tags: ["group"] } },
+    {
+      schema: {
+        body: CreateGroupInputSchema,
+        tags: ["group"],
+        description: "Create a new group",
+      },
+    },
     async (request, reply) => {
       const { name } = request.body;
 
@@ -48,6 +60,27 @@ export const GroupController: FastifyPluginAsync<{
       }
 
       return reply.status(201).send(result.payload);
+    }
+  );
+
+  const getGroup = new GetGroup(group);
+  fastify.get<{ Params: GroupId }>(
+    "/:id",
+    {
+      schema: {
+        params: GroupIdSchema,
+        tags: ["group"],
+        description: "Find a group by its id",
+      },
+    },
+    async (request, reply) => {
+      const result = await getGroup.execute(request.params.id);
+
+      if (!result.success) {
+        return reply.status(404).send();
+      }
+
+      return reply.status(200).send(result.payload);
     }
   );
 

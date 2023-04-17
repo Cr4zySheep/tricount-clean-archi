@@ -30,7 +30,13 @@ export const TransactionController: FastifyPluginAsync<{
   const addTransactionToGroup = new AddTransactionToGroup(group);
   fastify.post<{ Body: AddTransactionInput; Params: GroupId }>(
     "/",
-    { schema: { body: AddTransactionInputSchema, params: GroupIdSchema } },
+    {
+      schema: {
+        body: AddTransactionInputSchema,
+        params: GroupIdSchema,
+        tags: ["transaction"],
+      },
+    },
     async (request, reply) => {
       const { payerId, recipientsId, amount } = request.body;
 
@@ -52,7 +58,7 @@ export const TransactionController: FastifyPluginAsync<{
   const removeTransationToGroup = new RemoveTransactionToGroup(group);
   fastify.delete<{ Params: RemoveTransactionInput }>(
     "/:transactionId",
-    { schema: { params: RemoveTransactionInputSchema } },
+    { schema: { params: RemoveTransactionInputSchema, tags: ["transaction"] } },
     async (request, reply) => {
       const result = await removeTransationToGroup.execute(
         request.params.groupId,
